@@ -1,5 +1,4 @@
 import java.util.Map;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -22,7 +21,7 @@ public class Luke {
         "list", this::list
     );
 
-    private ArrayList<String> itemList = new ArrayList<>();
+    private final ItemList items = new ItemList();
 
 
     private static void printHoriLine() {
@@ -59,22 +58,17 @@ public class Luke {
 
 
     private void addItem(String item) {
-        itemList.add(item);
+        items.add(item);
         say("added: %s".formatted(item));
     }
-    
-    // Print all items in an ordered format
+
+    /** Show all items, or a placeholder message if there are none yet. */
     private void list() {
-        if (itemList.size() == 0) {
+        if (items.isEmpty()) {
             say("No items added.");
             return;
         }
-
-        ArrayList<String> lines = new ArrayList<>();
-        for (int i = 0; i < itemList.size(); i++) {
-            lines.add("%d. %s".formatted(i + 1, itemList.get(i)));
-        }
-        say(String.join("\n", lines));
+        say(items.format());
     }
 
 
