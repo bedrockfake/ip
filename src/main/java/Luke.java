@@ -3,8 +3,8 @@ import java.util.Scanner;
 
 /**
  * A small command-line chatbot. It greets the user, then reads lines of input
- * in a loop: recognised commands run their own action, and anything else is
- * added to a running list of items. Type "bye" to exit.
+ * in a loop. Each line is turned into a {@link Command}: a recognised keyword
+ * runs its own command, and anything else is added as an item. Type "bye" to exit.
  */
 public class Luke {
     private static final String CHATBOT_NAME = "Luke";
@@ -12,22 +12,28 @@ public class Luke {
     // ANSI escape codes. These are special strings the terminal reads as
     // "start colouring text" / "stop colouring text" rather than printing them.
     // We use them to make the bot's replies visually distinct from what you type.
-    private static final String BOT_COLOR = "\u001B[36m"; // cyan
-    private static final String RESET_BOT_COLOR = "\u001B[0m";      // back to normal
+    private static final String BOT_COLOR = "\u001B[36m";       // cyan
+    private static final String RESET_BOT_COLOR = "\u001B[0m";  // back to normal
 
-    // List of commands for the chatbot, anything not implemented defaults to `addItem`.
-    private final Map<String, Runnable> commands = Map.of(
-        "bye", Luke::bye,
-        "list", this::list
+    // Keyword -> command. Anything not listed here falls back to defaultCommand.
+    private final Map<String, Command> commands = Map.of(
+        "bye", Commands.BYE,
+        "list", Commands.LIST
     );
+
+    // Used when the input matches no known keyword: treat the whole line as a new item.
+    private final Command defaultCommand = Commands.ADD;
 
     private final ItemList items = new ItemList();
 
+    /** Gives commands access to the shared item list. */
+    ItemList items() {
+        return items;
+    }
 
     private static void printHoriLine() {
         System.out.println("-".repeat(60));
     }
-
 
     private static void printBanner() {
         String banner = " _         _        \n"
@@ -39,42 +45,20 @@ public class Luke {
     }
 
     /** Prints a message as the chatbot: in the bot's colour, followed by a divider. */
-    private static void say(String message) {
+    void say(String message) {
         message = message.strip(); // strip trailing \n
         System.out.println(BOT_COLOR + message + RESET_BOT_COLOR);
         printHoriLine();
     }
 
-
-    private static void greet() {
+    private void greet() {
         printBanner();
         say("Hello! I'm %s.\nWhat can I do for you?".formatted(CHATBOT_NAME));
     }
 
-
-    private static void bye() {
-        say("Bye. Hope to see you again soon!");
-    }
-
-
-    private void addItem(String item) {
-        items.add(item);
-        say("added: %s".formatted(item));
-    }
-
-    /** Show all items, or a placeholder message if there are none yet. */
-    private void list() {
-        if (items.isEmpty()) {
-            say("No items added.");
-            return;
-        }
-        say(items.format());
-    }
-
-
-    public static void main(String[] args) {
-        Luke chatbot = new Luke();
-        chatbot.greet();
+    /** Reads and runs commands until the user exits or the input ends. */
+    private void run() {
+        greet();
 
         Scanner sc = new Scanner(System.in);
         while (true) {
@@ -83,21 +67,33 @@ public class Luke {
                 break;
             }
             String line = sc.nextLine().strip();
-            if (line.equals("")) {
+            if (line.isEmpty()) {
                 continue; // ignore blanks
             }
 
-            // Look up the command; anything unrecognised is added as an item.
-            // Command lookup is case-insensitive, but the item keeps its original case.
-            Runnable cmd = chatbot.commands.getOrDefault(
-                line.toLowerCase(),
-                () -> chatbot.addItem(line)
-            );
-            cmd.run();
+            // Split into the keyword (first word) and the rest of the line.
+            // Command lookup is case-insensitive; the argument keeps its original case.
+            String[] parts = line.split(" ", 2);
+            String keyword = parts[0].toLowerCase();
+            String rest = parts.length > 1 ? parts[1] : "";
 
-            if (line.toLowerCase().equals("bye")) {
+            Command cmd = commands.get(keyword);
+            String argument;
+            if (cmd == null) {
+                cmd = defaultCommand;  // unrecognised: add the whole line as an item
+                argument = line;
+            } else {
+                argument = rest;
+            }
+
+            cmd.execute(this, argument);
+            if (cmd.isExit()) {
                 return;
             }
         }
+    }
+
+    public static void main(String[] args) {
+        new Luke().run();
     }
 }
