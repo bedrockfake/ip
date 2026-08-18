@@ -8,11 +8,51 @@ import java.util.List;
  * change independently.
  */
 public class ItemList {
-    private final List<String> items = new ArrayList<>();
+    private enum Checkbox {
+        Done, 
+        NotDone;
 
-    /** Adds an item to the end of the list. */
-    public void add(String item) {
-        items.add(item);
+        private char getChar() {
+            switch (this) {
+                case Done:
+                    return 'X';
+                case NotDone:
+                    return ' ';
+                default:
+                    throw new AssertionError("Unknown Checkbox value");
+            }
+        }
+    };
+
+    private class Item {
+        String name;
+        Checkbox completed;
+
+        Item(String name) {
+            this.name = name;
+            this.completed = Checkbox.NotDone;
+        }
+
+        private void setCompletion(boolean done) {
+            this.completed = done ? Checkbox.Done : Checkbox.NotDone;
+        }
+    };
+
+    private final List<Item> items = new ArrayList<>();
+
+    /** Adds an item to the end of the list. `completed` defaults to NotDone. */
+    public void add(String name) {
+        items.add(new Item(name));
+    }
+
+    /**
+     * Marks the item at the given position as done or not done.
+     *
+     * @param item_idx 0-based index of the item (0 is the first item)
+     * @param done     true to mark it done, false to mark it not done
+     */
+    public void setCompletion(int item_idx, boolean done) {
+        items.get(item_idx).setCompletion(done);
     }
 
     /** Returns true if no items have been added yet. */
@@ -21,13 +61,30 @@ public class ItemList {
     }
 
     /**
-     * Returns the items as a numbered list, one per line,
-     * e.g. "1. read book\n2. write essay".
+     * Returns a single item formatted with its checkbox, e.g. "[X] read book".
+     *
+     * @param item_idx 0-based index of the item to format
+     * @return the item's checkbox-and-name string (no leading number)
      */
-    public String format() {
+    public String format_one_item(int item_idx) {
+        Item item = items.get(item_idx);
+        return "[%c] %s".formatted(
+            item.completed.getChar(),
+            item.name
+        );
+    }
+
+    /**
+     * Returns the items with checkboxes as a numbered list, one per line,
+     * e.g. "1. [X] read book\n2. [ ] write essay".
+     */
+    public String format_all_items() {
         List<String> lines = new ArrayList<>();
         for (int i = 0; i < items.size(); i++) {
-            lines.add("%d. %s".formatted(i + 1, items.get(i)));
+            lines.add("%d. %s".formatted(
+                i + 1,
+                format_one_item(i)
+            ));
         }
         return String.join("\n", lines);
     }

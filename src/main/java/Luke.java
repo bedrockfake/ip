@@ -1,4 +1,3 @@
-import java.util.Map;
 import java.util.Scanner;
 
 /**
@@ -12,17 +11,9 @@ public class Luke {
     // ANSI escape codes. These are special strings the terminal reads as
     // "start colouring text" / "stop colouring text" rather than printing them.
     // We use them to make the bot's replies visually distinct from what you type.
-    private static final String BOT_COLOR = "\u001B[36m";       // cyan
-    private static final String RESET_BOT_COLOR = "\u001B[0m";  // back to normal
-
-    // Keyword -> command. Anything not listed here falls back to defaultCommand.
-    private final Map<String, Command> commands = Map.of(
-        "bye", Commands.BYE,
-        "list", Commands.LIST
-    );
-
-    // Used when the input matches no known keyword: treat the whole line as a new item.
-    private final Command defaultCommand = Commands.ADD;
+    private static final String DEFAULT_BOT_COLOR = "\u001B[36m"; // cyan
+    private static final String ERROR_BOT_COLOR = "\u001B[31m";   // red
+    private static final String RESET_BOT_COLOR = "\u001B[0m";    // back to normal
 
     private final ItemList items = new ItemList();
 
@@ -47,7 +38,13 @@ public class Luke {
     /** Prints a message as the chatbot: in the bot's colour, followed by a divider. */
     void say(String message) {
         message = message.strip(); // strip trailing \n
-        System.out.println(BOT_COLOR + message + RESET_BOT_COLOR);
+        System.out.println(DEFAULT_BOT_COLOR + message + RESET_BOT_COLOR);
+        printHoriLine();
+    }
+
+    void error(String message) {
+        message = message.strip(); // strip trailing \n
+        System.out.println(ERROR_BOT_COLOR + message + RESET_BOT_COLOR);
         printHoriLine();
     }
 
@@ -71,20 +68,16 @@ public class Luke {
                 continue; // ignore blanks
             }
 
-            // Split into the keyword (first word) and the rest of the line.
-            // Command lookup is case-insensitive; the argument keeps its original case.
+            // Split the line into [command] [argument]
             String[] parts = line.split(" ", 2);
-            String keyword = parts[0].toLowerCase();
+            String keyword = parts[0];
             String rest = parts.length > 1 ? parts[1] : "";
 
-            Command cmd = commands.get(keyword);
-            String argument;
-            if (cmd == null) {
-                cmd = defaultCommand;  // unrecognised: add the whole line as an item
-                argument = line;
-            } else {
-                argument = rest;
-            }
+            // The enum owns the keyword->command lookup (case-insensitive), so
+            // there's no second list here to keep in sync. An unknown keyword
+            // comes back as ADD, which treats the whole line as the item text.
+            Command cmd = Commands.fromKeyword(keyword);
+            String argument = (cmd == Commands.ADD) ? line : rest;
 
             cmd.execute(this, argument);
             if (cmd.isExit()) {
