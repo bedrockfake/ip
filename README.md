@@ -1,6 +1,6 @@
 # Luke project template
 
-This is a project template for a greenfield Java project. It's named after the Java mascot _Duke_. Given below are instructions on how to use it.
+This is a project template for a greenfield Java project. It's named after the Java mascot _Duke_. Luke is currently a command-line task tracker that can store todos, deadlines, and events.
 
 ## Setting up in Intellij
 
@@ -22,4 +22,28 @@ Prerequisites: JDK 25, update Intellij to the most recent version.
    |_____\__,_|_|\_\___|
    ```
 
-**Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location some tools (e.g., Gradle) expect to find Java files.
+**Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location many Java tools expect to find source files.
+
+## Running from the terminal
+
+Run Luke from the project root:
+
+```bash
+sh run.sh
+```
+
+`run.sh` compiles all source files into the `out` folder with `javac`, then starts `Luke`.
+
+## Running tests
+
+This repository uses a small dependency-free Java test runner instead of JUnit. Run:
+
+```bash
+sh test.sh
+```
+
+`test.sh` compiles `src/main/java` and `src/test/java`, then runs `LukeTest`.
+
+## User guide
+
+For supported commands and examples, see [docs/README.md](docs/README.md).
