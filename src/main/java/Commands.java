@@ -1,3 +1,9 @@
+import java.util.EnumMap;
+
+import exceptions.InvalidArgumentException;
+import exceptions.InvalidFlagException;
+import exceptions.UserInputException;
+
 /**
  * All the commands the chatbot understands, in one place. Each constant carries
  * the keyword that triggers it and provides its own {@link Command#execute} body,
@@ -9,7 +15,10 @@ public enum Commands implements Command {
     /** Says goodbye and ends the program. */
     BYE("bye") {
         @Override
-        public void execute(Luke bot, String argument) {
+        public void execute(Luke bot, String argument, EnumMap<Flag, String> flags)
+                throws UserInputException {
+            requireNoArgument("bye", argument);
+            requireNoFlags(flags);
             bot.say("Bye. Hope to see you again soon!");
         }
 
@@ -22,7 +31,11 @@ public enum Commands implements Command {
     /** Shows all items, or a placeholder message if there are none yet. */
     LIST("list") {
         @Override
-        public void execute(Luke bot, String argument) {
+        public void execute(Luke bot, String argument, EnumMap<Flag, String> flags)
+                throws UserInputException {
+            requireNoArgument("list", argument);
+            requireNoFlags(flags);
+
             ItemList items = bot.items();
             if (items.isEmpty()) {
                 bot.say("No items added.");
@@ -35,7 +48,10 @@ public enum Commands implements Command {
     /** Marks a specific task as done. */
     MARK("mark") {
         @Override
-        public void execute(Luke bot, String argument) {
+        public void execute(Luke bot, String argument, EnumMap<Flag, String> flags)
+                throws UserInputException {
+            requireNoFlags(flags);
+
             try {
                 int item_idx = Integer.parseInt(argument) - 1; // 1-based to 0-based
                 ItemList items = bot.items();
@@ -44,9 +60,9 @@ public enum Commands implements Command {
                     items.format_one_item(item_idx)
                 ));
             } catch (NumberFormatException e) {
-                bot.error("`mark` command received invalid index: %s".formatted(argument));
+                throw InvalidArgumentException.invalidIndex("mark", argument);
             } catch (IndexOutOfBoundsException e) {
-                bot.error("`mark` command received out-of-bounds index: %s".formatted(argument));
+                throw InvalidArgumentException.outOfBoundsIndex("mark", argument);
             }
         }
     },
@@ -54,7 +70,10 @@ public enum Commands implements Command {
     /** Marks a specific task as not done. */
     UNMARK("unmark") {
         @Override
-        public void execute(Luke bot, String argument) {
+        public void execute(Luke bot, String argument, EnumMap<Flag, String> flags)
+                throws UserInputException {
+            requireNoFlags(flags);
+
             try {
                 int item_idx = Integer.parseInt(argument) - 1;
                 ItemList items = bot.items();
@@ -63,27 +82,14 @@ public enum Commands implements Command {
                     items.format_one_item(item_idx)
                 ));
             } catch (NumberFormatException e) {
-                bot.error("`unmark` command received invalid index: %s".formatted(argument));
+                throw InvalidArgumentException.invalidIndex("unmark", argument);
             } catch (IndexOutOfBoundsException e) {
-                bot.error("`unmark` command received out-of-bounds index: %s".formatted(argument));
+                throw InvalidArgumentException.outOfBoundsIndex("unmark", argument);
             }
-        }
-    },
-
-    /**
-     * Fallback: any input that isn't a known keyword is added as an item.
-     * Its keyword is {@code null} so it's never matched by {@link #fromKeyword}
-     * directly — it's only ever returned as the default.
-     */
-    ADD(null) {
-        @Override
-        public void execute(Luke bot, String argument) {
-            bot.items().add(argument);
-            bot.say("added: %s".formatted(argument));
         }
     };
 
-    /** The word the user types to trigger this command (null for the fallback). */
+    /** The word the user types to trigger this command. */
     private final String keyword;
 
     Commands(String keyword) {
@@ -91,8 +97,38 @@ public enum Commands implements Command {
     }
 
     /**
-     * Returns the command whose keyword matches the given word (case-insensitive),
-     * or {@link #ADD} if none matches.
+     * Rejects text after commands that do not accept arguments.
+     *
+     * @param command the command name used in the error message
+     * @param argument the text after the command keyword
+     * @throws InvalidArgumentException if {@code argument} is not blank
+     */
+    private static void requireNoArgument(String command, String argument)
+            throws InvalidArgumentException {
+        if (!argument.isBlank()) {
+            throw InvalidArgumentException.unexpected(command, argument);
+        }
+    }
+
+    /**
+     * Rejects flags for commands that do not accept any flags.
+     *
+     * @param flags parsed flags from the user input
+     * @throws InvalidFlagException if any flag is present
+     */
+    private static void requireNoFlags(EnumMap<Flag, String> flags)
+            throws InvalidFlagException {
+        if (!flags.isEmpty()) {
+            Flag flag = flags.keySet().iterator().next();
+            throw InvalidFlagException.unsupported(flag.name().toLowerCase());
+        }
+    }
+
+    /**
+     * Returns the command whose keyword matches the given word (case-insensitive).
+     *
+     * @param word the first word typed by the user
+     * @return the matching command, or {@code null} if none matches
      */
     static Command fromKeyword(String word) {
         for (Commands command : values()) {
@@ -100,6 +136,6 @@ public enum Commands implements Command {
                 return command;
             }
         }
-        return ADD;
+        return null;
     }
 }

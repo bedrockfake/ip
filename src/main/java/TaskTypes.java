@@ -1,0 +1,60 @@
+import java.util.Collections;
+import java.util.EnumSet;
+
+/**
+ * Built-in task types and the flags required to create each one.
+ */
+public enum TaskTypes implements TaskType {
+    /** A simple task with no required flags. */
+    TODO("todo") {
+        @Override
+        public char getChar() {
+            return 'T';
+        }
+    },
+
+    /** A task that happens over a time range and requires {@code /from} and {@code /to}. */
+    EVENT("event", Flag.FROM, Flag.TO) {
+        @Override
+        public char getChar() {
+            return 'E';
+        }
+    },
+
+    /** A task with a due time and required {@code /by} flag. */
+    DEADLINE("deadline", Flag.BY) {
+        @Override
+        public char getChar() {
+            return 'D';
+        }
+    };
+
+    private final String keyword;
+    private final EnumSet<Flag> flags;
+
+    TaskTypes(String keyword, Flag... flags) {
+        this.keyword = keyword;
+        this.flags = EnumSet.noneOf(Flag.class);
+        Collections.addAll(this.flags, flags);
+    }
+
+    @Override
+    public EnumSet<Flag> getFlags() {
+        return this.flags;
+    }
+
+    /**
+     * Returns the task type whose keyword matches the given word.
+     *
+     * @param word the first word typed by the user
+     * @return the matching task type, or {@code null} if none matches
+     */
+    static TaskTypes fromKeyword(String word) {
+        for (TaskTypes tasktype : values()) {
+            if (word.equalsIgnoreCase(tasktype.keyword)) {
+                return tasktype;
+            }
+        }
+        return null;
+    }
+}
