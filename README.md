@@ -47,3 +47,9 @@ sh test.sh
 ## User guide
 
 For supported commands and examples, see [docs/README.md](docs/README.md).
+
+## AI assistance disclosure
+
+Codex was used to generate the unit tests and to write most of the user
+documentation and Javadocs. The generated content was reviewed and integrated
+into the project by the author.
