@@ -75,7 +75,7 @@ public enum Commands implements Command {
             requireNoFlags(flags);
 
             try {
-                int item_idx = Integer.parseInt(argument) - 1;
+                int item_idx = Integer.parseInt(argument) - 1; // 1-based to 0-based
                 ItemList items = bot.items();
                 items.setCompletion(item_idx, false);
                 bot.say("OK! I've marked this task as not done yet:\n %s".formatted(
@@ -85,6 +85,29 @@ public enum Commands implements Command {
                 throw InvalidArgumentException.invalidIndex("unmark", argument);
             } catch (IndexOutOfBoundsException e) {
                 throw InvalidArgumentException.outOfBoundsIndex("unmark", argument);
+            }
+        }
+    },
+    /** Deletes a specific task from the list. */
+    DELETE("delete") {
+        @Override
+        public void execute(Luke bot, String argument, EnumMap<Flag, String> flags)
+                throws UserInputException {
+            requireNoFlags(flags);
+
+            try {
+                int item_idx = Integer.parseInt(argument) - 1; // 1-based to 0-based
+                ItemList items = bot.items();
+                String removedItem = items.format_one_item(item_idx);
+                items.remove(item_idx);
+                bot.say("Noted. I've removed this task:\n"
+                        + " %s\n".formatted(removedItem)
+                        + "Now you have %d tasks in the list.".formatted(items.size())
+                );
+            } catch (NumberFormatException e) {
+                throw InvalidArgumentException.invalidIndex("delete", argument);
+            } catch (IndexOutOfBoundsException e) {
+                throw InvalidArgumentException.outOfBoundsIndex("delete", argument);
             }
         }
     };

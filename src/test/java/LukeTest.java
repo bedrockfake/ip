@@ -25,6 +25,7 @@ public class LukeTest {
         runTest("rejects missing flag values", this::rejectsMissingFlagValues);
         runTest("rejects extra arguments for no-argument commands", this::rejectsExtraArguments);
         runTest("marks and unmarks existing task", this::marksAndUnmarksExistingTask);
+        runTest("deletes existing task", this::deletesExistingTask);
         runTest("rejects bad mark indexes", this::rejectsBadMarkIndexes);
         runTest("shows placeholder for empty list", this::showsPlaceholderForEmptyList);
         runTest("rejects unsupported control characters", this::rejectsUnsupportedControlCharacters);
@@ -134,6 +135,26 @@ public class LukeTest {
         assertContains(output, "[T][X] read book");
         assertContains(output, "OK! I've marked this task as not done yet:");
         assertContains(output, "[T][ ] read book");
+    }
+
+    private void deletesExistingTask() {
+        String output = runLuke("""
+                todo idk
+                deadline ddl /by 1
+                mark 2
+                delete 2
+                list
+                delete 1
+                list
+                bye
+                """);
+
+        assertContains(output, "Noted. I've removed this task:");
+        assertContains(output, "[D][X] ddl (by: 1)");
+        assertContains(output, "Now you have 1 tasks in the list.");
+        assertContains(output, "1. [T][ ] idk");
+        assertContains(output, "Now you have 0 tasks in the list.");
+        assertContains(output, "No items added.");
     }
 
     private void rejectsBadMarkIndexes() {

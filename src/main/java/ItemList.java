@@ -70,6 +70,15 @@ public class ItemList {
     }
 
     /**
+     * Removes the item at the given position.
+     *
+     * @param item_idx 0-based index of the item to remove
+     */
+    public void remove(int item_idx) {
+        items.remove(item_idx);
+    }
+
+    /**
      * Marks the item at the given position as done or not done.
      *
      * @param item_idx 0-based index of the item (0 is the first item)
