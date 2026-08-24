@@ -1,3 +1,5 @@
+package luke.tasks;
+
 import java.util.Collections;
 import java.util.EnumSet;
 
@@ -49,7 +51,7 @@ public enum TaskTypes implements TaskType {
      * @param word the first word typed by the user
      * @return the matching task type, or {@code null} if none matches
      */
-    static TaskTypes fromKeyword(String word) {
+    public static TaskTypes fromKeyword(String word) {
         for (TaskTypes tasktype : values()) {
             if (word.equalsIgnoreCase(tasktype.keyword)) {
                 return tasktype;

@@ -1,3 +1,5 @@
+package luke;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -7,7 +9,7 @@ import java.nio.charset.StandardCharsets;
  * Simple dependency-free tests for Luke's command-line behaviour.
  * Run with:
  * javac -d out $(find src/main/java src/test/java -name "*.java")
- * java -cp out LukeTest
+ * java -cp out luke.LukeTest
  */
 public class LukeTest {
     private int passed = 0;

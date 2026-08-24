@@ -1,4 +1,4 @@
-package exceptions;
+package luke.exceptions;
 
 /** Represents a problem with a command's argument text. */
 public class InvalidArgumentException extends UserInputException {

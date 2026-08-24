@@ -1,8 +1,13 @@
+package luke.commands;
+
 import java.util.EnumMap;
 
-import exceptions.InvalidArgumentException;
-import exceptions.InvalidFlagException;
-import exceptions.UserInputException;
+import luke.Luke;
+import luke.exceptions.InvalidArgumentException;
+import luke.exceptions.InvalidFlagException;
+import luke.exceptions.UserInputException;
+import luke.tasks.Flag;
+import luke.tasks.ItemList;
 
 /**
  * All the commands the chatbot understands, in one place. Each constant carries
@@ -153,7 +158,7 @@ public enum Commands implements Command {
      * @param word the first word typed by the user
      * @return the matching command, or {@code null} if none matches
      */
-    static Command fromKeyword(String word) {
+    public static Command fromKeyword(String word) {
         for (Commands command : values()) {
             if (word.equalsIgnoreCase(command.keyword)) {
                 return command;

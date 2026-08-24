@@ -1,4 +1,4 @@
-package exceptions;
+package luke.exceptions;
 
 /**
  * Represents an input problem that should be shown to the user as a normal

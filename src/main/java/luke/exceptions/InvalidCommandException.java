@@ -1,4 +1,4 @@
-package exceptions;
+package luke.exceptions;
 
 /** Thrown when the first word of the input is not a supported command. */
 public class InvalidCommandException extends UserInputException {

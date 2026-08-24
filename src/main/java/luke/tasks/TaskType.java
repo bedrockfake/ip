@@ -1,3 +1,5 @@
+package luke.tasks;
+
 import java.util.EnumSet;
 
 /**

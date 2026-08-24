@@ -213,22 +213,23 @@ Luke reports user input problems as normal chatbot errors. Common examples:
 
 ### Source Layout
 
-Main source files are in `src/main/java`.
+Main source files are in `src/main/java/luke`.
 
 Important classes:
 
 | File | Purpose |
 | --- | --- |
-| `Luke.java` | Reads user input, parses commands and flags, and displays errors. |
-| `Commands.java` | Defines non-task commands such as `list`, `mark`, `unmark`, `delete`, and `bye`. |
-| `TaskTypes.java` | Defines task-creation keywords and their required flags. |
-| `AddTaskCommands.java` | Validates and adds todo, deadline, and event tasks. |
-| `ItemList.java` | Stores tasks and formats them for display. |
-| `exceptions/` | Contains grouped user-input exceptions. |
+| `luke/Luke.java` | Reads user input, parses commands and flags, and displays errors. |
+| `luke/commands/Commands.java` | Defines non-task commands such as `list`, `mark`, `unmark`, `delete`, and `bye`. |
+| `luke/commands/AddTaskCommands.java` | Validates and adds todo, deadline, and event tasks. |
+| `luke/tasks/TaskTypes.java` | Defines task-creation keywords and their required flags. |
+| `luke/tasks/ItemList.java` | Stores tasks and formats them for display. |
+| `luke/storage/ItemListStorage.java` | Handles loading and saving the task list. |
+| `luke/exceptions/` | Contains grouped user-input exceptions. |
 
 ### Tests
 
-Tests are in `src/test/java/LukeTest.java`. They run the full command-line program with scripted input and check the printed output.
+Tests are in `src/test/java/luke/LukeTest.java`. They run the full command-line program with scripted input and check the printed output.
 
 Run tests from the project root:
 

@@ -1,3 +1,5 @@
+package luke;
+
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -5,10 +7,17 @@ import java.util.regex.Pattern;
 import java.util.EnumMap;
 import java.util.List;
 
-import exceptions.InvalidArgumentException;
-import exceptions.InvalidCommandException;
-import exceptions.InvalidFlagException;
-import exceptions.UserInputException;
+import luke.commands.AddTaskCommands;
+import luke.commands.Command;
+import luke.commands.Commands;
+import luke.exceptions.InvalidArgumentException;
+import luke.exceptions.InvalidCommandException;
+import luke.exceptions.InvalidFlagException;
+import luke.exceptions.UserInputException;
+import luke.tasks.Flag;
+import luke.tasks.ItemList;
+import luke.tasks.TaskType;
+import luke.tasks.TaskTypes;
 
 /**
  * A small command-line chatbot. It greets the user, then reads lines of input
@@ -34,8 +43,12 @@ public class Luke {
     public Luke() {
     }
 
-    /** Gives commands access to the shared item list. */
-    ItemList items() {
+    /**
+     * Gives commands access to the shared item list.
+     *
+     * @return the task list owned by this chatbot
+     */
+    public ItemList items() {
         return items;
     }
 
@@ -57,7 +70,7 @@ public class Luke {
      *
      * @param message text to show to the user
      */
-    void say(String message) {
+    public void say(String message) {
         message = message.strip(); // strip trailing \n
         System.out.println(DEFAULT_BOT_COLOR + message + RESET_BOT_COLOR);
         printHoriLine();
@@ -68,7 +81,7 @@ public class Luke {
      *
      * @param message error text to show to the user
      */
-    void error(String message) {
+    public void error(String message) {
         message = message.strip(); // strip trailing \n
         System.out.println(ERROR_BOT_COLOR + message + RESET_BOT_COLOR);
         printHoriLine();

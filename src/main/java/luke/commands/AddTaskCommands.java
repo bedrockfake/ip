@@ -1,8 +1,13 @@
+package luke.commands;
+
 import java.util.EnumMap;
 
-import exceptions.InvalidArgumentException;
-import exceptions.InvalidFlagException;
-import exceptions.UserInputException;
+import luke.Luke;
+import luke.exceptions.InvalidArgumentException;
+import luke.exceptions.InvalidFlagException;
+import luke.exceptions.UserInputException;
+import luke.tasks.Flag;
+import luke.tasks.TaskType;
 
 /**
  * Creates a task of one configured {@link TaskType}. The same command class is

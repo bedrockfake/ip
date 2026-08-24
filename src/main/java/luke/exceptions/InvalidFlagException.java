@@ -1,4 +1,4 @@
-package exceptions;
+package luke.exceptions;
 
 /** Represents a problem with command flags such as /by, /from, or /to. */
 public class InvalidFlagException extends UserInputException {
