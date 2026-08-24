@@ -36,11 +36,11 @@ public class ItemList {
      */
     private static class Item {
         String name;
-        TaskType taskType;
+        TaskTypes taskType;
         Checkbox completed;
         EnumMap<Flag, String> flags;
 
-        Item(String name, TaskType taskType, EnumMap<Flag, String> flags) {
+        Item(String name, TaskTypes taskType, EnumMap<Flag, String> flags) {
             this.name = name;
             this.taskType = taskType;
             this.completed = Checkbox.NOT_DONE;
@@ -67,7 +67,7 @@ public class ItemList {
      * @param taskType task type such as todo, deadline, or event
      * @param flags flag values associated with the task
      */
-    public void add(String name, TaskType taskType, EnumMap<Flag, String> flags) {
+    public void add(String name, TaskTypes taskType, EnumMap<Flag, String> flags) {
         items.add(new Item(name, taskType, flags));
     }
 

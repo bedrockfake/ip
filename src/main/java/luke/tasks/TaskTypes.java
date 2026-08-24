@@ -6,7 +6,7 @@ import java.util.EnumSet;
 /**
  * Built-in task types and the flags required to create each one.
  */
-public enum TaskTypes implements TaskType {
+public enum TaskTypes {
     /** A simple task with no required flags. */
     TODO("todo") {
         @Override
@@ -40,7 +40,18 @@ public enum TaskTypes implements TaskType {
         Collections.addAll(this.flags, flags);
     }
 
-    @Override
+    /**
+     * Returns the single-character label used when displaying this task type.
+     *
+     * @return display character such as {@code T}, {@code D}, or {@code E}
+     */
+    public abstract char getChar();
+
+    /**
+     * Returns the flags required when creating this task type.
+     *
+     * @return required flags; empty for task types with no required flags
+     */
     public EnumSet<Flag> getFlags() {
         return this.flags;
     }

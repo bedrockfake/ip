@@ -7,22 +7,22 @@ import luke.exceptions.InvalidArgumentException;
 import luke.exceptions.InvalidFlagException;
 import luke.exceptions.UserInputException;
 import luke.tasks.Flag;
-import luke.tasks.TaskType;
+import luke.tasks.TaskTypes;
 
 /**
- * Creates a task of one configured {@link TaskType}. The same command class is
+ * Creates a task of one configured {@link TaskTypes}. The same command class is
  * reused for todos, deadlines, and events because they share the same add flow:
  * validate the description, validate flags, add to the list, and show feedback.
  */
 public class AddTaskCommands implements Command {
-    private final TaskType taskType;
+    private final TaskTypes taskType;
 
     /**
      * Creates an add-task command for the given task type.
      *
      * @param taskType the task type this command should create
      */
-    public AddTaskCommands(TaskType taskType) {
+    public AddTaskCommands(TaskTypes taskType) {
         this.taskType = taskType;
     }
 

@@ -16,7 +16,6 @@ import luke.exceptions.InvalidFlagException;
 import luke.exceptions.UserInputException;
 import luke.tasks.Flag;
 import luke.tasks.ItemList;
-import luke.tasks.TaskType;
 import luke.tasks.TaskTypes;
 
 /**
@@ -120,7 +119,7 @@ public class Luke {
             return command;
         }
 
-        TaskType taskType = TaskTypes.findByKeyword(keyword);
+        TaskTypes taskType = TaskTypes.findByKeyword(keyword);
         if (taskType != null) {
             return new AddTaskCommands(taskType);
         }
