@@ -29,7 +29,7 @@ public interface Command {
      *
      * @return {@code true} if this command should end the program
      */
-    default boolean isExit() {
+    default boolean shouldExit() {
         return false;
     }
 }

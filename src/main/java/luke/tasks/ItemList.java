@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 /**
  * Stores the items the user has added and knows how to present them as a
  * numbered list. This class deals only with the data; deciding how to display
- * it (colours, dividers, etc.) is left to the chatbot, so the two concerns can
+ * it (colors, dividers, etc.) is left to the chatbot, so the two concerns can
  * change independently.
  */
 public class ItemList {
@@ -16,41 +16,41 @@ public class ItemList {
      * Completion state shown in the second display bracket.
      */
     private enum Checkbox {
-        Done, 
-        NotDone;
+        DONE,
+        NOT_DONE;
 
         private char getChar() {
             switch (this) {
-                case Done:
+                case DONE:
                     return 'X';
-                case NotDone:
+                case NOT_DONE:
                     return ' ';
                 default:
                     throw new AssertionError("Unknown Checkbox value");
             }
         }
-    };
+    }
 
     /**
      * One stored task and its display state.
      */
     private static class Item {
         String name;
-        TaskType tasktype;
+        TaskType taskType;
         Checkbox completed;
         EnumMap<Flag, String> flags;
 
-        Item(String name, TaskType tasktype, EnumMap<Flag, String> flags) {
+        Item(String name, TaskType taskType, EnumMap<Flag, String> flags) {
             this.name = name;
-            this.tasktype = tasktype;
-            this.completed = Checkbox.NotDone;
+            this.taskType = taskType;
+            this.completed = Checkbox.NOT_DONE;
             this.flags = flags;
         }
 
         private void setCompletion(boolean done) {
-            this.completed = done ? Checkbox.Done : Checkbox.NotDone;
+            this.completed = done ? Checkbox.DONE : Checkbox.NOT_DONE;
         }
-    };
+    }
 
     private final List<Item> items = new ArrayList<>();
 
@@ -64,30 +64,30 @@ public class ItemList {
      * Adds an item to the end of the list. Completion defaults to not done.
      *
      * @param name task description
-     * @param tasktype task type such as todo, deadline, or event
+     * @param taskType task type such as todo, deadline, or event
      * @param flags flag values associated with the task
      */
-    public void add(String name, TaskType tasktype, EnumMap<Flag, String> flags) {
-        items.add(new Item(name, tasktype, flags));
+    public void add(String name, TaskType taskType, EnumMap<Flag, String> flags) {
+        items.add(new Item(name, taskType, flags));
     }
 
     /**
      * Removes the item at the given position.
      *
-     * @param item_idx 0-based index of the item to remove
+     * @param itemIndex 0-based index of the item to remove
      */
-    public void remove(int item_idx) {
-        items.remove(item_idx);
+    public void remove(int itemIndex) {
+        items.remove(itemIndex);
     }
 
     /**
      * Marks the item at the given position as done or not done.
      *
-     * @param item_idx 0-based index of the item (0 is the first item)
+     * @param itemIndex 0-based index of the item (0 is the first item)
      * @param done     true to mark it done, false to mark it not done
      */
-    public void setCompletion(int item_idx, boolean done) {
-        items.get(item_idx).setCompletion(done);
+    public void setCompletion(int itemIndex, boolean done) {
+        items.get(itemIndex).setCompletion(done);
     }
 
     /**
@@ -112,18 +112,18 @@ public class ItemList {
      * Formats flags for display after the task description.
      *
      * @param flags flag values to format
-     * @return an empty string if there are no flags; otherwise a parenthesised string
+     * @return an empty string if there are no flags; otherwise a parenthesized string
      */
-    public String format_flags(EnumMap<Flag, String> flags) {
+    public String formatFlags(EnumMap<Flag, String> flags) {
         if (flags.isEmpty()) {
             return "";
         } else {
             return " (%s)".formatted(
-                flags.entrySet().stream()
-                .map(entry -> "%s: %s".formatted(
-                        entry.getKey().name().toLowerCase(),
-                        entry.getValue()))
-                .collect(Collectors.joining(" "))
+                    flags.entrySet().stream()
+                            .map(entry -> "%s: %s".formatted(
+                                    entry.getKey().name().toLowerCase(),
+                                    entry.getValue()))
+                            .collect(Collectors.joining(" "))
             );
         }
     }
@@ -131,16 +131,16 @@ public class ItemList {
     /**
      * Returns a single item formatted with its type, checkbox, description, and flags.
      *
-     * @param item_idx 0-based index of the item to format
+     * @param itemIndex 0-based index of the item to format
      * @return the formatted item without a leading list number
      */
-    public String format_one_item(int item_idx) {
-        Item item = items.get(item_idx);
+    public String formatOneItem(int itemIndex) {
+        Item item = items.get(itemIndex);
         return "[%c][%c] %s%s".formatted(
-            item.tasktype.getChar(),
-            item.completed.getChar(),
-            item.name,
-            format_flags(item.flags)
+                item.taskType.getChar(),
+                item.completed.getChar(),
+                item.name,
+                formatFlags(item.flags)
         );
     }
 
@@ -150,12 +150,12 @@ public class ItemList {
      *
      * @return all items formatted as a numbered list
      */
-    public String format_all_items() {
+    public String formatAllItems() {
         List<String> lines = new ArrayList<>();
         for (int i = 0; i < items.size(); i++) {
             lines.add("%d. %s".formatted(
-                i + 1,
-                format_one_item(i)
+                    i + 1,
+                    formatOneItem(i)
             ));
         }
         return String.join("\n", lines);

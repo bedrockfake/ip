@@ -1,11 +1,11 @@
 package luke;
 
-import java.util.Scanner;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import luke.commands.AddTaskCommands;
 import luke.commands.Command;
@@ -29,7 +29,7 @@ public class Luke {
     private static final String CHATBOT_NAME = "Luke";
 
     // ANSI escape codes. These are special strings the terminal reads as
-    // "start colouring text" / "stop colouring text" rather than printing them.
+    // "start coloring text" / "stop coloring text" rather than printing them.
     // We use them to make the bot's replies visually distinct from what you type.
     private static final String DEFAULT_BOT_COLOR = "\u001B[36m"; // cyan
     private static final String ERROR_BOT_COLOR = "\u001B[31m";   // red
@@ -44,15 +44,15 @@ public class Luke {
     }
 
     /**
-     * Gives commands access to the shared item list.
+     * Returns the shared item list used by commands.
      *
      * @return the task list owned by this chatbot
      */
-    public ItemList items() {
+    public ItemList getItems() {
         return items;
     }
 
-    private static void printHoriLine() {
+    private static void printHorizontalLine() {
         System.out.println("-".repeat(60));
     }
 
@@ -73,7 +73,7 @@ public class Luke {
     public void say(String message) {
         message = message.strip(); // strip trailing \n
         System.out.println(DEFAULT_BOT_COLOR + message + RESET_BOT_COLOR);
-        printHoriLine();
+        printHorizontalLine();
     }
 
     /**
@@ -84,7 +84,7 @@ public class Luke {
     public void error(String message) {
         message = message.strip(); // strip trailing \n
         System.out.println(ERROR_BOT_COLOR + message + RESET_BOT_COLOR);
-        printHoriLine();
+        printHorizontalLine();
     }
 
     private void greet() {
@@ -96,13 +96,13 @@ public class Luke {
      * A parsed user input line, ready to execute.
      */
     private static class Invocation {
-        Command cmd;
-        String arg;
+        Command command;
+        String argument;
         EnumMap<Flag, String> flags;
 
-        Invocation(Command cmd, String arg, EnumMap<Flag, String> flags) {
-            this.cmd = cmd;
-            this.arg = arg;
+        Invocation(Command command, String argument, EnumMap<Flag, String> flags) {
+            this.command = command;
+            this.argument = argument;
             this.flags = flags;
         }
     }
@@ -112,15 +112,15 @@ public class Luke {
      *
      * @param keyword the first word typed by the user
      * @return a built-in command or a task-creation command
-     * @throws InvalidCommandException if the keyword is not recognised
+     * @throws InvalidCommandException if the keyword is not recognized
      */
     private Command parseCommand(String keyword) throws InvalidCommandException {
-        Command command = Commands.fromKeyword(keyword);
+        Command command = Commands.findByKeyword(keyword);
         if (command != null) {
             return command;
         }
 
-        TaskType taskType = TaskTypes.fromKeyword(keyword);
+        TaskType taskType = TaskTypes.findByKeyword(keyword);
         if (taskType != null) {
             return new AddTaskCommands(taskType);
         }
@@ -151,9 +151,7 @@ public class Luke {
      * @throws UserInputException if the command or flags are invalid
      */
     private Invocation parseUserInput(String line) throws UserInputException {
-        
-        Command cmd;
-        String arg;
+        String argument;
         EnumMap<Flag, String> flags = new EnumMap<>(Flag.class);
 
         // Split the line into [command] [rest]
@@ -161,7 +159,7 @@ public class Luke {
         String keyword = parts[0];
         String rest = parts.length > 1 ? parts[1] : "";
 
-        cmd = parseCommand(keyword);
+        Command command = parseCommand(keyword);
 
         // A flag starts at the beginning of the argument text or after whitespace.
         Pattern flagPattern = Pattern.compile("(^|\\s)/(\\w+)");
@@ -176,9 +174,9 @@ public class Luke {
         }
 
         if (flagMatches.isEmpty()) {
-            arg = rest.trim();
+            argument = rest.trim();
         } else {
-            arg = rest.substring(0, flagMatches.get(0).start).trim();
+            argument = rest.substring(0, flagMatches.get(0).start).trim();
 
             for (int i = 0; i < flagMatches.size(); i++) {
                 FlagMatch flagMatch = flagMatches.get(i);
@@ -186,7 +184,7 @@ public class Luke {
                         ? flagMatches.get(i + 1).start
                         : rest.length();
                 String value = rest.substring(flagMatch.valueStart, valueEnd).trim();
-                Flag flag = Flag.fromKeyword(flagMatch.keyword);
+                Flag flag = Flag.findByKeyword(flagMatch.keyword);
 
                 if (flag == null) {
                     throw InvalidFlagException.unidentified(flagMatch.keyword);
@@ -200,7 +198,7 @@ public class Luke {
             }
         }
 
-        return new Invocation(cmd, arg, flags);
+        return new Invocation(command, argument, flags);
     }
 
     /**
@@ -209,24 +207,24 @@ public class Luke {
     private void run() {
         greet();
 
-        Scanner sc = new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.print("> ");
-            if (!sc.hasNextLine()) {
+            if (!scanner.hasNextLine()) {
                 break;
             }
-            String line = sc.nextLine().strip();
+            String line = scanner.nextLine().strip();
             if (line.isEmpty()) {
                 continue; // ignore blanks
             }
-            
+
             try {
                 if (line.chars().anyMatch(Character::isISOControl)) {
                     throw InvalidArgumentException.unsupportedControlCharacter();
                 }
-                Invocation inv = parseUserInput(line);
-                inv.cmd.execute(this, inv.arg, inv.flags);
-                if (inv.cmd.isExit()) {
+                Invocation invocation = parseUserInput(line);
+                invocation.command.execute(this, invocation.argument, invocation.flags);
+                if (invocation.command.shouldExit()) {
                     return;
                 }
             } catch (UserInputException e) {

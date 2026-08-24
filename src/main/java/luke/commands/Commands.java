@@ -12,8 +12,8 @@ import luke.tasks.ItemList;
 /**
  * All the commands the chatbot understands, in one place. Each constant carries
  * the keyword that triggers it and provides its own {@link Command#execute} body,
- * so a command's keyword and behaviour live together. Looking a keyword up is done
- * here via {@link #fromKeyword}, so the rest of the program has no second list to
+ * so a command's keyword and behavior live together. Looking a keyword up is done
+ * here via {@link #findByKeyword}, so the rest of the program has no second list to
  * keep in sync.
  */
 public enum Commands implements Command {
@@ -28,7 +28,7 @@ public enum Commands implements Command {
         }
 
         @Override
-        public boolean isExit() {
+        public boolean shouldExit() {
             return true;
         }
     },
@@ -41,11 +41,11 @@ public enum Commands implements Command {
             requireNoArgument("list", argument);
             requireNoFlags(flags);
 
-            ItemList items = bot.items();
+            ItemList items = bot.getItems();
             if (items.isEmpty()) {
                 bot.say("No items added.");
             } else {
-                bot.say(items.format_all_items());
+                bot.say(items.formatAllItems());
             }
         }
     },
@@ -58,11 +58,11 @@ public enum Commands implements Command {
             requireNoFlags(flags);
 
             try {
-                int item_idx = Integer.parseInt(argument) - 1; // 1-based to 0-based
-                ItemList items = bot.items();
-                items.setCompletion(item_idx, true);
+                int itemIndex = Integer.parseInt(argument) - 1; // 1-based to 0-based
+                ItemList items = bot.getItems();
+                items.setCompletion(itemIndex, true);
                 bot.say("Nice! I've marked this task as done:\n %s".formatted(
-                    items.format_one_item(item_idx)
+                        items.formatOneItem(itemIndex)
                 ));
             } catch (NumberFormatException e) {
                 throw InvalidArgumentException.invalidIndex("mark", argument);
@@ -80,11 +80,11 @@ public enum Commands implements Command {
             requireNoFlags(flags);
 
             try {
-                int item_idx = Integer.parseInt(argument) - 1; // 1-based to 0-based
-                ItemList items = bot.items();
-                items.setCompletion(item_idx, false);
+                int itemIndex = Integer.parseInt(argument) - 1; // 1-based to 0-based
+                ItemList items = bot.getItems();
+                items.setCompletion(itemIndex, false);
                 bot.say("OK! I've marked this task as not done yet:\n %s".formatted(
-                    items.format_one_item(item_idx)
+                        items.formatOneItem(itemIndex)
                 ));
             } catch (NumberFormatException e) {
                 throw InvalidArgumentException.invalidIndex("unmark", argument);
@@ -101,10 +101,10 @@ public enum Commands implements Command {
             requireNoFlags(flags);
 
             try {
-                int item_idx = Integer.parseInt(argument) - 1; // 1-based to 0-based
-                ItemList items = bot.items();
-                String removedItem = items.format_one_item(item_idx);
-                items.remove(item_idx);
+                int itemIndex = Integer.parseInt(argument) - 1; // 1-based to 0-based
+                ItemList items = bot.getItems();
+                String removedItem = items.formatOneItem(itemIndex);
+                items.remove(itemIndex);
                 bot.say("Noted. I've removed this task:\n"
                         + " %s\n".formatted(removedItem)
                         + "Now you have %d tasks in the list.".formatted(items.size())
@@ -158,7 +158,7 @@ public enum Commands implements Command {
      * @param word the first word typed by the user
      * @return the matching command, or {@code null} if none matches
      */
-    public static Command fromKeyword(String word) {
+    public static Command findByKeyword(String word) {
         for (Commands command : values()) {
             if (word.equalsIgnoreCase(command.keyword)) {
                 return command;

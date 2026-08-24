@@ -15,15 +15,15 @@ import luke.tasks.TaskType;
  * validate the description, validate flags, add to the list, and show feedback.
  */
 public class AddTaskCommands implements Command {
-    private final TaskType tasktype;
+    private final TaskType taskType;
 
     /**
      * Creates an add-task command for the given task type.
      *
-     * @param tasktype the task type this command should create
+     * @param taskType the task type this command should create
      */
-    public AddTaskCommands(TaskType tasktype) {
-        this.tasktype = tasktype;
+    public AddTaskCommands(TaskType taskType) {
+        this.taskType = taskType;
     }
 
     /**
@@ -41,25 +41,25 @@ public class AddTaskCommands implements Command {
             String argument,
             EnumMap<Flag, String> flags) throws UserInputException {
         if (argument.isBlank()) {
-            throw InvalidArgumentException.missingDescription(tasktype.toString().toLowerCase());
+            throw InvalidArgumentException.missingDescription(taskType.toString().toLowerCase());
         }
         
         for (Flag flag : flags.keySet()) {
-            if (!tasktype.getFlags().contains(flag)) {
+            if (!taskType.getFlags().contains(flag)) {
                 throw InvalidFlagException.unsupported(flag.name().toLowerCase());
             }
         }
 
-        for (Flag requiredFlag : tasktype.getFlags()) {
+        for (Flag requiredFlag : taskType.getFlags()) {
             if (!flags.containsKey(requiredFlag)) {
                 throw InvalidFlagException.missingRequired(requiredFlag.name().toLowerCase());
             }
         }
 
-        bot.items().add(argument, tasktype, flags);
-        int size = bot.items().size();
+        bot.getItems().add(argument, taskType, flags);
+        int size = bot.getItems().size();
         bot.say("Got it. I've added this task:\n"
-                + "  %s\n".formatted(bot.items().format_one_item(size - 1))
+                + "  %s\n".formatted(bot.getItems().formatOneItem(size - 1))
                 + "Now you have %d tasks in the list.".formatted(size)
         );
     }

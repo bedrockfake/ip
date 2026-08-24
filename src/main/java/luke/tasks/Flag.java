@@ -25,10 +25,10 @@ public enum Flag {
      * @param word the flag keyword without the leading slash
      * @return the matching flag, or {@code null} if none matches
      */
-    public static Flag fromKeyword(String word) {
-        for (Flag f : values()) {
-            if (word.equalsIgnoreCase(f.keyword)) {
-                return f;
+    public static Flag findByKeyword(String word) {
+        for (Flag flag : values()) {
+            if (word.equalsIgnoreCase(flag.keyword)) {
+                return flag;
             }
         }
         return null;

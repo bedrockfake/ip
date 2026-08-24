@@ -6,7 +6,7 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Simple dependency-free tests for Luke's command-line behaviour.
+ * Simple dependency-free tests for Luke's command-line behavior.
  * Run with:
  * javac -d out $(find src/main/java src/test/java -name "*.java")
  * java -cp out luke.LukeTest
@@ -22,7 +22,8 @@ public class LukeTest {
 
     private void runAll() {
         runTest("adds and lists supported task types", this::addsAndListsSupportedTaskTypes);
-        runTest("accepts case-insensitive keywords and flags", this::acceptsCaseInsensitiveKeywordsAndFlags);
+        runTest("accepts case-insensitive keywords and flags",
+                this::acceptsCaseInsensitiveKeywordsAndFlags);
         runTest("rejects malformed task input", this::rejectsMalformedTaskInput);
         runTest("rejects missing flag values", this::rejectsMissingFlagValues);
         runTest("rejects extra arguments for no-argument commands", this::rejectsExtraArguments);
@@ -30,7 +31,8 @@ public class LukeTest {
         runTest("deletes existing task", this::deletesExistingTask);
         runTest("rejects bad mark indexes", this::rejectsBadMarkIndexes);
         runTest("shows placeholder for empty list", this::showsPlaceholderForEmptyList);
-        runTest("rejects unsupported control characters", this::rejectsUnsupportedControlCharacters);
+        runTest("rejects unsupported control characters",
+                this::rejectsUnsupportedControlCharacters);
 
         System.out.println("%d passed, %d failed".formatted(passed, failed));
         if (failed > 0) {
