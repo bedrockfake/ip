@@ -70,6 +70,11 @@ public enum Commands implements Command {
                 throw InvalidArgumentException.outOfBoundsIndex("mark", argument);
             }
         }
+
+        @Override
+        public boolean shouldSaveItemList() {
+            return true;
+        }
     },
 
     /** Marks a specific task as not done. */
@@ -92,7 +97,13 @@ public enum Commands implements Command {
                 throw InvalidArgumentException.outOfBoundsIndex("unmark", argument);
             }
         }
+
+        @Override
+        public boolean shouldSaveItemList() {
+            return true;
+        }
     },
+
     /** Deletes a specific task from the list. */
     DELETE("delete") {
         @Override
@@ -114,6 +125,11 @@ public enum Commands implements Command {
             } catch (IndexOutOfBoundsException e) {
                 throw InvalidArgumentException.outOfBoundsIndex("delete", argument);
             }
+        }
+
+        @Override
+        public boolean shouldSaveItemList() {
+            return true;
         }
     };
 

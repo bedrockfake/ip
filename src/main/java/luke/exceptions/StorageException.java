@@ -1,0 +1,32 @@
+package luke.exceptions;
+
+/**
+ * Represents a storage problem that should be shown to the user as a normal
+ * chatbot error.
+ */
+public class StorageException extends UserInputException {
+    private StorageException(String message, Throwable cause) {
+        super(message);
+        initCause(cause);
+    }
+
+    /**
+     * Creates an error for failures while loading saved tasks.
+     *
+     * @param cause original storage failure
+     * @return formatted storage exception
+     */
+    public static StorageException loadFailed(Throwable cause) {
+        return new StorageException("Failed to load task list from data.", cause);
+    }
+
+    /**
+     * Creates an error for failures while saving tasks.
+     *
+     * @param cause original storage failure
+     * @return formatted storage exception
+     */
+    public static StorageException saveFailed(Throwable cause) {
+        return new StorageException("Failed to save task list to data.", cause);
+    }
+}

@@ -24,6 +24,17 @@ public interface Command {
             throws UserInputException;
 
     /**
+     * Whether the task list should be saved after this command runs successfully.
+     * Commands that only display output do not need saving, so the default is
+     * {@code false}.
+     *
+     * @return {@code true} if this command changes the task list
+     */
+    default boolean shouldSaveItemList() {
+        return false;
+    }
+
+    /**
      * Whether the chatbot should stop reading input after this command runs.
      * Most commands don't end the program, so the default is {@code false}.
      *

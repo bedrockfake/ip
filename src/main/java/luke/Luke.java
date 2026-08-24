@@ -13,7 +13,9 @@ import luke.commands.Commands;
 import luke.exceptions.InvalidArgumentException;
 import luke.exceptions.InvalidCommandException;
 import luke.exceptions.InvalidFlagException;
+import luke.exceptions.StorageException;
 import luke.exceptions.UserInputException;
+import luke.storage.ItemListStorage;
 import luke.tasks.Flag;
 import luke.tasks.ItemList;
 import luke.tasks.TaskTypes;
@@ -34,12 +36,20 @@ public class Luke {
     private static final String ERROR_BOT_COLOR = "\u001B[31m";   // red
     private static final String RESET_BOT_COLOR = "\u001B[0m";    // back to normal
 
-    private final ItemList items = new ItemList();
+    private final ItemList items;
 
     /**
-     * Creates a chatbot with an empty task list.
+     * Creates a chatbot with the task list loaded from ItemListStorage.
      */
     public Luke() {
+        ItemList loadedItems;
+        try {
+            loadedItems = ItemListStorage.load();
+        } catch (StorageException e) {
+            loadedItems = new ItemList();
+            this.error(e.getMessage());
+        }
+        items = loadedItems;
     }
 
     /**
@@ -223,6 +233,13 @@ public class Luke {
                 }
                 Invocation invocation = parseUserInput(line);
                 invocation.command.execute(this, invocation.argument, invocation.flags);
+                if (invocation.command.shouldSaveItemList()) {
+                    try {
+                        ItemListStorage.save(items);
+                    } catch (StorageException e) {
+                        this.error(e.getMessage());
+                    }
+                }
                 if (invocation.command.shouldExit()) {
                     return;
                 }

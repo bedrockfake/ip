@@ -63,4 +63,9 @@ public class AddTaskCommands implements Command {
                 + "Now you have %d tasks in the list.".formatted(size)
         );
     }
+
+    @Override
+    public boolean shouldSaveItemList() {
+        return true;
+    }
 }
