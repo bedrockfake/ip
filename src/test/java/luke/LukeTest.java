@@ -2,8 +2,11 @@ package luke;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * Simple dependency-free tests for Luke's command-line behavior.
@@ -29,6 +32,12 @@ public class LukeTest {
         runTest("rejects extra arguments for no-argument commands", this::rejectsExtraArguments);
         runTest("marks and unmarks existing task", this::marksAndUnmarksExistingTask);
         runTest("deletes existing task", this::deletesExistingTask);
+        runTest("persists tasks between sessions", this::persistsTasksBetweenSessions);
+        runTest("reports storage failures as chatbot errors", this::reportsStorageFailuresAsChatbotErrors);
+        runTest("reports malformed storage data as chatbot error",
+                this::reportsMalformedStorageDataAsChatbotError);
+        runTest("reports invalid stored task type as chatbot error",
+                this::reportsInvalidStoredTaskTypeAsChatbotError);
         runTest("rejects bad mark indexes", this::rejectsBadMarkIndexes);
         runTest("shows placeholder for empty list", this::showsPlaceholderForEmptyList);
         runTest("rejects unsupported control characters",
@@ -161,6 +170,76 @@ public class LukeTest {
         assertContains(output, "No items added.");
     }
 
+    private void persistsTasksBetweenSessions() {
+        Path storageFile = createTempStorageFile();
+        try {
+            runLuke("""
+                    todo remember me
+                    bye
+                    """, storageFile);
+
+            String output = runLuke("""
+                    list
+                    bye
+                    """, storageFile);
+
+            assertContains(output, "1. [T][ ] remember me");
+        } finally {
+            deleteTempStorageFile(storageFile);
+        }
+    }
+
+    private void reportsStorageFailuresAsChatbotErrors() {
+        Path storageDirectory = createTempStorageDirectory();
+        try {
+            String output = runLuke("""
+                    todo cannot save
+                    bye
+                    """, storageDirectory);
+
+            assertContains(output, "Failed to load task list from data:");
+            assertContains(output, "Failed to save task list to data:");
+        } finally {
+            deleteTempStorageDirectory(storageDirectory);
+        }
+    }
+
+    private void reportsMalformedStorageDataAsChatbotError() {
+        Path storageFile = createTempStorageFile();
+        try {
+            writeString(storageFile, "not enough fields");
+
+            String output = runLuke("""
+                    list
+                    bye
+                    """, storageFile);
+
+            assertContains(output, "Failed to load task list from data:");
+            assertContains(output, "Storage line has missing fields.");
+            assertContains(output, "No items added.");
+        } finally {
+            deleteTempStorageFile(storageFile);
+        }
+    }
+
+    private void reportsInvalidStoredTaskTypeAsChatbotError() {
+        Path storageFile = createTempStorageFile();
+        try {
+            writeString(storageFile, "NOPE\t0\tbad");
+
+            String output = runLuke("""
+                    list
+                    bye
+                    """, storageFile);
+
+            assertContains(output, "Failed to load task list from data:");
+            assertContains(output, "Storage line has invalid task type.");
+            assertContains(output, "No items added.");
+        } finally {
+            deleteTempStorageFile(storageFile);
+        }
+    }
+
     private void rejectsBadMarkIndexes() {
         String output = runLuke("""
                 mark banana
@@ -192,18 +271,76 @@ public class LukeTest {
     }
 
     private String runLuke(String input) {
+        Path storageFile = createTempStorageFile();
+        try {
+            return runLuke(input, storageFile);
+        } finally {
+            deleteTempStorageFile(storageFile);
+        }
+    }
+
+    private String runLuke(String input, Path storageFile) {
         PrintStream originalOut = System.out;
         java.io.InputStream originalIn = System.in;
+        String originalStoragePath = System.getProperty("luke.storage.path");
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
         try {
+            System.setProperty("luke.storage.path", storageFile.toString());
             System.setIn(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)));
             System.setOut(new PrintStream(output, true, StandardCharsets.UTF_8));
             Luke.main(new String[0]);
             return output.toString(StandardCharsets.UTF_8);
         } finally {
+            if (originalStoragePath == null) {
+                System.clearProperty("luke.storage.path");
+            } else {
+                System.setProperty("luke.storage.path", originalStoragePath);
+            }
             System.setIn(originalIn);
             System.setOut(originalOut);
+        }
+    }
+
+    private Path createTempStorageFile() {
+        try {
+            return Files.createTempDirectory("luke-test").resolve("itemlist.txt");
+        } catch (IOException e) {
+            throw new AssertionError("Could not create temp storage path", e);
+        }
+    }
+
+    private Path createTempStorageDirectory() {
+        try {
+            return Files.createTempDirectory("luke-test-storage-dir");
+        } catch (IOException e) {
+            throw new AssertionError("Could not create temp storage directory", e);
+        }
+    }
+
+    private void writeString(Path path, String content) {
+        try {
+            Files.createDirectories(path.getParent());
+            Files.writeString(path, content, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new AssertionError("Could not write temp storage data", e);
+        }
+    }
+
+    private void deleteTempStorageFile(Path storageFile) {
+        try {
+            Files.deleteIfExists(storageFile);
+            Files.deleteIfExists(storageFile.getParent());
+        } catch (IOException e) {
+            throw new AssertionError("Could not delete temp storage path", e);
+        }
+    }
+
+    private void deleteTempStorageDirectory(Path storageDirectory) {
+        try {
+            Files.deleteIfExists(storageDirectory);
+        } catch (IOException e) {
+            throw new AssertionError("Could not delete temp storage directory", e);
         }
     }
 
