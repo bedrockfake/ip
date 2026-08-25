@@ -109,6 +109,63 @@ public class ItemList {
     }
 
     /**
+     * Returns the description of the item at the given position.
+     *
+     * @param itemIndex 0-based index of the item
+     * @return item description
+     */
+    public String getName(int itemIndex) {
+        return items.get(itemIndex).name;
+    }
+
+    /**
+     * Returns the task type of the item at the given position.
+     *
+     * @param itemIndex 0-based index of the item
+     * @return item task type
+     */
+    public TaskTypes getTaskType(int itemIndex) {
+        return items.get(itemIndex).taskType;
+    }
+
+    /**
+     * Returns whether the item at the given position is marked as done.
+     *
+     * @param itemIndex 0-based index of the item
+     * @return {@code true} if the item is done
+     */
+    public boolean isDone(int itemIndex) {
+        return items.get(itemIndex).completed == Checkbox.DONE;
+    }
+
+    /**
+     * Returns the flag values of the item at the given position.
+     *
+     * @param itemIndex 0-based index of the item
+     * @return copy of the item's flag values
+     */
+    public EnumMap<Flag, String> getFlags(int itemIndex) {
+        return new EnumMap<>(items.get(itemIndex).flags);
+    }
+
+    /**
+     * Adds an item loaded from storage.
+     *
+     * @param name task description
+     * @param taskType task type such as todo, deadline, or event
+     * @param flags flag values associated with the task
+     * @param isDone whether the loaded item is marked as done
+     */
+    public void addLoadedItem(
+            String name,
+            TaskTypes taskType,
+            EnumMap<Flag, String> flags,
+            boolean isDone) {
+        add(name, taskType, flags);
+        setCompletion(size() - 1, isDone);
+    }
+
+    /**
      * Formats flags for display after the task description.
      *
      * @param flags flag values to format
