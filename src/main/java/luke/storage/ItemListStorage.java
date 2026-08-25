@@ -36,6 +36,14 @@ public final class ItemListStorage {
         return System.getProperty(STORAGE_PATH_PROPERTY, DEFAULT_FILE_PATH);
     }
 
+    /**
+     * Returns the storage file path, creating its parent directory and file if
+     * they do not exist yet.
+     *
+     * @param filePath path to Luke's storage file
+     * @return existing storage file path
+     * @throws IOException if the file or its parent directory cannot be created
+     */
     private static Path getFilePath(String filePath) throws IOException {
         Path path = Paths.get(filePath);
         if (path.getParent() != null) {
@@ -80,6 +88,12 @@ public final class ItemListStorage {
         }
     }
 
+    /**
+     * Formats the task list into storage lines.
+     *
+     * @param itemList task list to save
+     * @return one tab-separated line per item
+     */
     private static List<String> formatStorageLines(ItemList itemList) {
         List<String> lines = new ArrayList<>();
         for (int i = 0; i < itemList.size(); i++) {
@@ -98,6 +112,12 @@ public final class ItemListStorage {
         return lines;
     }
 
+    /**
+     * Parses storage lines into an item list.
+     *
+     * @param lines saved storage lines
+     * @return task list represented by the lines
+     */
     private static ItemList parseStorageLines(List<String> lines) {
         ItemList itemList = new ItemList();
         for (String line : lines) {
@@ -106,6 +126,12 @@ public final class ItemListStorage {
         return itemList;
     }
 
+    /**
+     * Parses and adds one saved line to the item list.
+     *
+     * @param itemList task list being loaded
+     * @param line saved storage line
+     */
     private static void addStorageLine(ItemList itemList, String line) {
         String[] fields = line.split("\t", -1);
         if (fields.length < 3) {
@@ -132,6 +158,12 @@ public final class ItemListStorage {
         itemList.addLoadedItem(itemName, taskType, flags, isDone);
     }
 
+    /**
+     * Parses a saved task type value.
+     *
+     * @param value saved task type text
+     * @return matching task type
+     */
     private static TaskTypes parseStoredTaskType(String value) {
         try {
             return TaskTypes.valueOf(value);
@@ -140,6 +172,12 @@ public final class ItemListStorage {
         }
     }
 
+    /**
+     * Parses a saved completion value.
+     *
+     * @param value saved completion text
+     * @return {@code true} if the saved value means done
+     */
     private static boolean parseStoredCompletion(String value) {
         if (value.equals("1")) {
             return true;

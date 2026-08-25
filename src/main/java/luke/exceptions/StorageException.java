@@ -5,6 +5,12 @@ package luke.exceptions;
  * chatbot error.
  */
 public class StorageException extends UserInputException {
+    /**
+     * Creates a storage exception with a user-facing message and original cause.
+     *
+     * @param message message to show to the user
+     * @param cause original storage failure
+     */
     private StorageException(String message, Throwable cause) {
         super(message);
         initCause(cause);
@@ -18,8 +24,8 @@ public class StorageException extends UserInputException {
      */
     public static StorageException loadFailed(Throwable cause) {
         return new StorageException("Failed to load task list from data:\n"
-                                    + ">  %s".formatted(cause.getMessage()), 
-                                    cause);
+                + ">  %s".formatted(cause.getMessage()),
+                cause);
     }
 
     /**
@@ -30,7 +36,7 @@ public class StorageException extends UserInputException {
      */
     public static StorageException saveFailed(Throwable cause) {
         return new StorageException("Failed to save task list to data:\n"
-                                    + ">  %s".formatted(cause.getMessage()), 
-                                    cause);
+                + ">  %s".formatted(cause.getMessage()),
+                cause);
     }
 }
