@@ -17,7 +17,9 @@ public class StorageException extends UserInputException {
      * @return formatted storage exception
      */
     public static StorageException loadFailed(Throwable cause) {
-        return new StorageException("Failed to load task list from data.", cause);
+        return new StorageException("Failed to load task list from data:\n"
+                                    + ">  %s".formatted(cause.getMessage()), 
+                                    cause);
     }
 
     /**
@@ -27,6 +29,8 @@ public class StorageException extends UserInputException {
      * @return formatted storage exception
      */
     public static StorageException saveFailed(Throwable cause) {
-        return new StorageException("Failed to save task list to data.", cause);
+        return new StorageException("Failed to save task list to data:\n"
+                                    + ">  %s".formatted(cause.getMessage()), 
+                                    cause);
     }
 }
