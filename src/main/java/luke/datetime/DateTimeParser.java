@@ -1,0 +1,119 @@
+package luke.datetime;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
+import java.util.List;
+import java.util.Locale;
+
+/**
+ * Formats date and time values typed in command flags.
+ */
+public final class DateTimeParser {
+    private static final List<DateTimeFormatter> INPUT_DATES = List.of(
+            strictFormatter("d/M/uuuu"),
+            strictFormatter("d-M-uuuu"),
+            strictFormatter("uuuu-M-d"),
+            strictFormatter("d MMM uuuu"),
+            strictFormatter("d MMMM uuuu"));
+    private static final List<DateTimeFormatter> INPUT_DATE_TIMES = List.of(
+            strictFormatter("d/M/uuuu HHmm"),
+            strictFormatter("d-M-uuuu HHmm"),
+            strictFormatter("uuuu-M-d HHmm"),
+            strictFormatter("d MMM uuuu HHmm"),
+            strictFormatter("d MMMM uuuu HHmm"));
+    private static final List<DateTimeFormatter> INPUT_TIMES = List.of(
+            strictFormatter("HHmm"),
+            strictFormatter("H:mm"),
+            strictFormatter("h:mm a"),
+            strictFormatter("ha"));
+    private static final DateTimeFormatter DISPLAY_DATE =
+            DateTimeFormatter.ofPattern("MMM d yyyy", Locale.ENGLISH);
+    private static final DateTimeFormatter DISPLAY_DATE_TIME =
+            DateTimeFormatter.ofPattern("MMM d yyyy h:mm a", Locale.ENGLISH);
+    private static final DateTimeFormatter DISPLAY_TIME =
+            DateTimeFormatter.ofPattern("h:mm a", Locale.ENGLISH);
+
+    private DateTimeParser() {
+    }
+
+    /**
+     * Formats a date, date-time, or time typed in a command flag.
+     *
+     * @param value text from a flag
+     * @return formatted date/time text, or the original text if it is not recognized
+     */
+    public static String parseDateOrTimeFromFlag(String value) {
+        String trimmedValue = value.trim();
+
+        String formattedDateTime = formatDateTime(trimmedValue);
+        if (formattedDateTime != null) {
+            return formattedDateTime;
+        }
+
+        String formattedDate = formatDate(trimmedValue);
+        if (formattedDate != null) {
+            return formattedDate;
+        }
+
+        String formattedTime = formatTime(trimmedValue);
+        if (formattedTime != null) {
+            return formattedTime;
+        }
+
+        return value;
+    }
+
+    private static String formatDateTime(String value) {
+        for (DateTimeFormatter formatter : INPUT_DATE_TIMES) {
+            try {
+                return LocalDateTime.parse(value, formatter).format(DISPLAY_DATE_TIME);
+            } catch (DateTimeParseException e) {
+                // Try the next supported date-time format.
+            }
+        }
+        return null;
+    }
+
+    private static String formatDate(String value) {
+        for (DateTimeFormatter formatter : INPUT_DATES) {
+            try {
+                return LocalDate.parse(value, formatter).format(DISPLAY_DATE);
+            } catch (DateTimeParseException e) {
+                // Try the next supported date format.
+            }
+        }
+        return null;
+    }
+
+    private static String formatTime(String value) {
+        for (DateTimeFormatter formatter : INPUT_TIMES) {
+            try {
+                return LocalTime.parse(value.toUpperCase(), formatter).format(DISPLAY_TIME);
+            } catch (DateTimeParseException e) {
+                // Try the next supported time format.
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Creates a formatter for one accepted date/time pattern. The pattern tells
+     * the builder what shape to parse, the English locale keeps month and AM/PM
+     * text consistent across computers, and strict resolver style rejects invalid
+     * dates such as 31/2/2019.
+     *
+     * @param pattern date/time pattern accepted by {@link DateTimeFormatterBuilder}
+     * @return strict formatter for the given pattern
+     */
+    private static DateTimeFormatter strictFormatter(String pattern) {
+        return new DateTimeFormatterBuilder()
+                .appendPattern(pattern)
+                .toFormatter(Locale.ENGLISH)
+                .withResolverStyle(ResolverStyle.STRICT);
+    }
+}
