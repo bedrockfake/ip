@@ -105,9 +105,9 @@ public class Luke {
      * A parsed user input line, ready to execute.
      */
     private static class Invocation {
-        Command command;
-        String argument;
-        EnumMap<Flag, String> flags;
+        private final Command command;
+        private final String argument;
+        private final EnumMap<Flag, String> flags;
 
         Invocation(Command command, String argument, EnumMap<Flag, String> flags) {
             this.command = command;

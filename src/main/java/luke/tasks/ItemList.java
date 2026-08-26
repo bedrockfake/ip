@@ -35,10 +35,10 @@ public class ItemList {
      * One stored task and its display state.
      */
     private static class Item {
-        String name;
-        TaskTypes taskType;
-        Checkbox completed;
-        EnumMap<Flag, String> flags;
+        private final String name;
+        private final TaskTypes taskType;
+        private Checkbox completed;
+        private final EnumMap<Flag, String> flags;
 
         Item(String name, TaskTypes taskType, EnumMap<Flag, String> flags) {
             this.name = name;
