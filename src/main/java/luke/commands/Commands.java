@@ -39,11 +39,13 @@ public enum Commands implements Command {
         public void execute(Luke bot, String argument, EnumMap<Flag, String> flags)
                 throws UserInputException {
             requireNoArgument("list", argument);
-            requireNoFlags(flags);
+            requireOnlySortFlag(flags);
 
             ItemList items = bot.getItems();
             if (items.isEmpty()) {
                 bot.say("No items added.");
+            } else if (flags.containsKey(Flag.SORT)) {
+                bot.say(items.formatAllItemsSortedByTime());
             } else {
                 bot.say(items.formatAllItems());
             }
@@ -165,6 +167,33 @@ public enum Commands implements Command {
         if (!flags.isEmpty()) {
             Flag flag = flags.keySet().iterator().next();
             throw InvalidFlagException.unsupported(flag.name().toLowerCase());
+        }
+    }
+
+    /**
+     * Rejects flags other than {@code /sort time} for the list command.
+     *
+     * @param flags parsed flags from the user input
+     * @throws InvalidFlagException if the sort flag is invalid or another flag is present
+     */
+    private static void requireOnlySortFlag(EnumMap<Flag, String> flags)
+            throws InvalidFlagException {
+        if (flags.isEmpty()) {
+            return;
+        }
+        if (!flags.containsKey(Flag.SORT)) {
+            Flag flag = flags.keySet().iterator().next();
+            throw InvalidFlagException.unsupported(flag.name().toLowerCase());
+        }
+        if (flags.size() > 1) {
+            for (Flag flag : flags.keySet()) {
+                if (flag != Flag.SORT) {
+                    throw InvalidFlagException.unsupported(flag.name().toLowerCase());
+                }
+            }
+        }
+        if (!flags.get(Flag.SORT).equalsIgnoreCase("time")) {
+            throw InvalidFlagException.unsupportedValue("sort", flags.get(Flag.SORT));
         }
     }
 

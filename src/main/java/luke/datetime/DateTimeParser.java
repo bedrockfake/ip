@@ -22,6 +22,7 @@ public final class DateTimeParser {
             strictFormatter("d MMM uuuu"),
             strictFormatter("d MMMM uuuu"));
     private static final List<DateTimeFormatter> INPUT_DATE_TIMES = List.of(
+            strictFormatter("MMM d uuuu h:mm a"),
             strictFormatter("d/M/uuuu HHmm"),
             strictFormatter("d/M/uuuu H:mm"),
             strictFormatter("d/M/uuuu h:mm a"),
@@ -60,7 +61,7 @@ public final class DateTimeParser {
      * @param value text from a flag
      * @return formatted date/time text, or the original text if it is not recognized
      */
-    public static String parseDateOrTimeFromFlag(String value) {
+    public static String formatDateOrTimeFromFlag(String value) {
         String trimmedValue = value.trim();
 
         String formattedDateTime = formatDateTime(trimmedValue);
@@ -81,10 +82,52 @@ public final class DateTimeParser {
         return value;
     }
 
+    /**
+     * Parses a value into a key suitable for sorting by date or time.
+     *
+     * @param value text from a task flag
+     * @return sortable date-time key, or {@code null} if the value is not recognized
+     */
+    public static LocalDateTime parseSortKey(String value) {
+        String trimmedValue = value.trim();
+
+        LocalDateTime parsedDateTime = parseDateTime(trimmedValue);
+        if (parsedDateTime != null) {
+            return parsedDateTime;
+        }
+
+        LocalDate parsedDate = parseDate(trimmedValue);
+        if (parsedDate != null) {
+            return parsedDate.atStartOfDay();
+        }
+
+        LocalTime parsedTime = parseTime(trimmedValue);
+        if (parsedTime != null) {
+            return LocalDate.MIN.atTime(parsedTime);
+        }
+
+        return null;
+    }
+
     private static String formatDateTime(String value) {
+        LocalDateTime parsedDateTime = parseDateTime(value);
+        return parsedDateTime == null ? null : parsedDateTime.format(DISPLAY_DATE_TIME);
+    }
+
+    private static String formatDate(String value) {
+        LocalDate parsedDate = parseDate(value);
+        return parsedDate == null ? null : parsedDate.format(DISPLAY_DATE);
+    }
+
+    private static String formatTime(String value) {
+        LocalTime parsedTime = parseTime(value);
+        return parsedTime == null ? null : parsedTime.format(DISPLAY_TIME);
+    }
+
+    private static LocalDateTime parseDateTime(String value) {
         for (DateTimeFormatter formatter : INPUT_DATE_TIMES) {
             try {
-                return LocalDateTime.parse(value.toUpperCase(), formatter).format(DISPLAY_DATE_TIME);
+                return LocalDateTime.parse(value.toUpperCase(), formatter);
             } catch (DateTimeParseException e) {
                 // Try the next supported date-time format.
             }
@@ -92,10 +135,10 @@ public final class DateTimeParser {
         return null;
     }
 
-    private static String formatDate(String value) {
+    private static LocalDate parseDate(String value) {
         for (DateTimeFormatter formatter : INPUT_DATES) {
             try {
-                return LocalDate.parse(value, formatter).format(DISPLAY_DATE);
+                return LocalDate.parse(value, formatter);
             } catch (DateTimeParseException e) {
                 // Try the next supported date format.
             }
@@ -103,10 +146,10 @@ public final class DateTimeParser {
         return null;
     }
 
-    private static String formatTime(String value) {
+    private static LocalTime parseTime(String value) {
         for (DateTimeFormatter formatter : INPUT_TIMES) {
             try {
-                return LocalTime.parse(value.toUpperCase(), formatter).format(DISPLAY_TIME);
+                return LocalTime.parse(value.toUpperCase(), formatter);
             } catch (DateTimeParseException e) {
                 // Try the next supported time format.
             }

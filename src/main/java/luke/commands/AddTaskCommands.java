@@ -73,7 +73,7 @@ public class AddTaskCommands implements Command {
 
     private static void formatDateTimeFlags(EnumMap<Flag, String> flags) {
         for (Flag flag : flags.keySet()) {
-            flags.put(flag, DateTimeParser.parseDateOrTimeFromFlag(flags.get(flag)));
+            flags.put(flag, DateTimeParser.formatDateOrTimeFromFlag(flags.get(flag)));
         }
     }
 }

@@ -11,7 +11,10 @@ public enum Flag {
     FROM("from"),
 
     /** Event end time, written as {@code /to}. */
-    TO("to");
+    TO("to"),
+
+    /** List sorting mode, written as {@code /sort}. */
+    SORT("sort");
 
     private final String keyword;
 

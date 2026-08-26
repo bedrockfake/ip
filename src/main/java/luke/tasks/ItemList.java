@@ -1,9 +1,13 @@
 package luke.tasks;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import luke.datetime.DateTimeParser;
 
 /**
  * Stores the items the user has added and knows how to present them as a
@@ -208,13 +212,53 @@ public class ItemList {
      * @return all items formatted as a numbered list
      */
     public String formatAllItems() {
-        List<String> lines = new ArrayList<>();
+        return formatNumberedItems(rangeIndexes());
+    }
+
+    /**
+     * Returns the items sorted by parseable flag date/time values.
+     *
+     * @return all items formatted as a numbered list
+     */
+    public String formatAllItemsSortedByTime() {
+        List<Integer> sortedIndexes = rangeIndexes();
+        sortedIndexes.sort(Comparator
+                .comparing(this::hasNoTimeSortKey)
+                .thenComparing(this::getTimeSortKey)
+                .thenComparingInt(Integer::intValue));
+        return formatNumberedItems(sortedIndexes);
+    }
+
+    private List<Integer> rangeIndexes() {
+        List<Integer> indexes = new ArrayList<>();
         for (int i = 0; i < items.size(); i++) {
+            indexes.add(i);
+        }
+        return indexes;
+    }
+
+    private String formatNumberedItems(List<Integer> itemIndexes) {
+        List<String> lines = new ArrayList<>();
+        for (int i = 0; i < itemIndexes.size(); i++) {
             lines.add("%d. %s".formatted(
                     i + 1,
-                    formatOneItem(i)
+                    formatOneItem(itemIndexes.get(i))
             ));
         }
         return String.join("\n", lines);
+    }
+
+    private boolean hasNoTimeSortKey(int itemIndex) {
+        return getTimeSortKey(itemIndex).equals(LocalDateTime.MAX);
+    }
+
+    private LocalDateTime getTimeSortKey(int itemIndex) {
+        for (String value : items.get(itemIndex).flags.values()) {
+            LocalDateTime sortKey = DateTimeParser.parseSortKey(value);
+            if (sortKey != null) {
+                return sortKey;
+            }
+        }
+        return LocalDateTime.MAX;
     }
 }

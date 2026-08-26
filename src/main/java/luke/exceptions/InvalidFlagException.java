@@ -55,4 +55,15 @@ public class InvalidFlagException extends UserInputException {
     public static InvalidFlagException unsupported(String flag) {
         return new InvalidFlagException("Unsupported flag: /%s".formatted(flag));
     }
+
+    /**
+     * Creates an error for an unsupported value used with a known flag.
+     *
+     * @param flag flag keyword without the leading slash
+     * @param value unsupported value supplied for the flag
+     * @return formatted flag exception
+     */
+    public static InvalidFlagException unsupportedValue(String flag, String value) {
+        return new InvalidFlagException("Unsupported value for /%s: %s".formatted(flag, value));
+    }
 }
