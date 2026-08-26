@@ -3,6 +3,7 @@ package luke.commands;
 import java.util.EnumMap;
 
 import luke.Luke;
+import luke.datetime.DateTimeParser;
 import luke.exceptions.InvalidArgumentException;
 import luke.exceptions.InvalidFlagException;
 import luke.exceptions.UserInputException;
@@ -55,6 +56,7 @@ public class AddTaskCommands implements Command {
                 throw InvalidFlagException.missingRequired(requiredFlag.name().toLowerCase());
             }
         }
+        formatDateTimeFlags(flags);
 
         bot.getItems().add(argument, taskType, flags);
         int size = bot.getItems().size();
@@ -67,5 +69,11 @@ public class AddTaskCommands implements Command {
     @Override
     public boolean shouldSaveItemList() {
         return true;
+    }
+
+    private static void formatDateTimeFlags(EnumMap<Flag, String> flags) {
+        for (Flag flag : flags.keySet()) {
+            flags.put(flag, DateTimeParser.parseDateOrTimeFromFlag(flags.get(flag)));
+        }
     }
 }
