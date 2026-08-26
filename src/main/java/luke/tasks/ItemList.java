@@ -223,8 +223,7 @@ public class ItemList {
     public String formatAllItemsSortedByTime() {
         List<Integer> sortedIndexes = rangeIndexes();
         sortedIndexes.sort(Comparator
-                .comparing(this::hasNoTimeSortKey)
-                .thenComparing(this::getTimeSortKey)
+                .comparing(this::getTimeSortKey)
                 .thenComparingInt(Integer::intValue));
         return formatNumberedItems(sortedIndexes);
     }
@@ -246,10 +245,6 @@ public class ItemList {
             ));
         }
         return String.join("\n", lines);
-    }
-
-    private boolean hasNoTimeSortKey(int itemIndex) {
-        return getTimeSortKey(itemIndex).equals(LocalDateTime.MAX);
     }
 
     private LocalDateTime getTimeSortKey(int itemIndex) {
