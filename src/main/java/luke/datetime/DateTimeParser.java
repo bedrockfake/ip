@@ -18,19 +18,32 @@ public final class DateTimeParser {
             strictFormatter("d/M/uuuu"),
             strictFormatter("d-M-uuuu"),
             strictFormatter("uuuu-M-d"),
+            strictFormatter("uuuu/M/d"),
             strictFormatter("d MMM uuuu"),
             strictFormatter("d MMMM uuuu"));
     private static final List<DateTimeFormatter> INPUT_DATE_TIMES = List.of(
             strictFormatter("d/M/uuuu HHmm"),
+            strictFormatter("d/M/uuuu H:mm"),
+            strictFormatter("d/M/uuuu h:mm a"),
+            strictFormatter("d/M/uuuu h:mma"),
+            strictFormatter("d/M/uuuu ha"),
+            strictFormatter("d/M/uuuu h a"),
             strictFormatter("d-M-uuuu HHmm"),
+            strictFormatter("d-M-uuuu H:mm"),
             strictFormatter("uuuu-M-d HHmm"),
+            strictFormatter("uuuu-M-d H:mm"),
+            strictFormatter("uuuu/M/d HHmm"),
+            strictFormatter("uuuu/M/d H:mm"),
             strictFormatter("d MMM uuuu HHmm"),
+            strictFormatter("d MMM uuuu H:mm"),
             strictFormatter("d MMMM uuuu HHmm"));
     private static final List<DateTimeFormatter> INPUT_TIMES = List.of(
             strictFormatter("HHmm"),
             strictFormatter("H:mm"),
             strictFormatter("h:mm a"),
-            strictFormatter("ha"));
+            strictFormatter("h:mma"),
+            strictFormatter("ha"),
+            strictFormatter("h a"));
     private static final DateTimeFormatter DISPLAY_DATE =
             DateTimeFormatter.ofPattern("MMM d yyyy", Locale.ENGLISH);
     private static final DateTimeFormatter DISPLAY_DATE_TIME =
@@ -71,7 +84,7 @@ public final class DateTimeParser {
     private static String formatDateTime(String value) {
         for (DateTimeFormatter formatter : INPUT_DATE_TIMES) {
             try {
-                return LocalDateTime.parse(value, formatter).format(DISPLAY_DATE_TIME);
+                return LocalDateTime.parse(value.toUpperCase(), formatter).format(DISPLAY_DATE_TIME);
             } catch (DateTimeParseException e) {
                 // Try the next supported date-time format.
             }
@@ -103,15 +116,17 @@ public final class DateTimeParser {
 
     /**
      * Creates a formatter for one accepted date/time pattern. The pattern tells
-     * the builder what shape to parse, the English locale keeps month and AM/PM
-     * text consistent across computers, and strict resolver style rejects invalid
-     * dates such as 31/2/2019.
+     * the builder what shape to parse, case-insensitive parsing accepts input
+     * such as PM or pm, the English locale keeps month and AM/PM text consistent
+     * across computers, and strict resolver style rejects invalid dates such as
+     * 31/2/2019.
      *
      * @param pattern date/time pattern accepted by {@link DateTimeFormatterBuilder}
      * @return strict formatter for the given pattern
      */
     private static DateTimeFormatter strictFormatter(String pattern) {
         return new DateTimeFormatterBuilder()
+                .parseCaseInsensitive()
                 .appendPattern(pattern)
                 .toFormatter(Locale.ENGLISH)
                 .withResolverStyle(ResolverStyle.STRICT);
