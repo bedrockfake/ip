@@ -1,0 +1,34 @@
+plugins {
+    id 'application'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
+}
+
+application {
+    mainClass = 'luke.Luke'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 25
+}
+
+tasks.named('run') {
+    standardInput = System.in
+}
+
+tasks.register('cliTest', JavaExec) {
+    group = 'verification'
+    description = 'Runs Luke dependency-free CLI regression tests.'
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'luke.LukeTest'
+    dependsOn tasks.named('testClasses')
+}
+
+tasks.named('test') {
+    dependsOn tasks.named('cliTest')
+    failOnNoDiscoveredTests = false
+}
