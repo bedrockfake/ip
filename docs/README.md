@@ -251,14 +251,15 @@ Important classes:
 
 ### Tests
 
-Tests are in `src/test/java/luke`. `LukeTest.java` runs the suite,
-`LukeCliTest.java` checks the full command-line program with scripted input,
-and `DateTimeParserTest.java` checks date/time formatting behavior.
+JUnit tests are in `src/test/java/luke`. `LukeCliTest.java` checks successful
+command-line flows, `LukeValidationTest.java` checks invalid input,
+`LukeStorageTest.java` checks loading and saving, and `DateTimeParserTest.java`
+checks date/time formatting behavior.
 
 Run tests from the project root:
 
 ```bash
-sh test.sh
+./gradlew test
 ```
 
-The tests are dependency-free, so no Gradle, Maven, or JUnit setup is required.
+`test.sh` is also available as a shortcut and delegates to Gradle.

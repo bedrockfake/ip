@@ -7,6 +7,11 @@ java {
     targetCompatibility = JavaVersion.VERSION_25
 }
 
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
 application {
     mainClass = 'luke.Luke'
 }
@@ -20,15 +25,6 @@ tasks.named('run') {
     standardInput = System.in
 }
 
-tasks.register('cliTest', JavaExec) {
-    group = 'verification'
-    description = 'Runs Luke dependency-free CLI regression tests.'
-    classpath = sourceSets.test.runtimeClasspath
-    mainClass = 'luke.LukeTest'
-    dependsOn tasks.named('testClasses')
-}
-
 tasks.named('test') {
-    dependsOn tasks.named('cliTest')
-    failOnNoDiscoveredTests = false
+    useJUnitPlatform()
 }

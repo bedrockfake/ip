@@ -36,13 +36,13 @@ sh run.sh
 
 ## Running tests
 
-This repository uses a small dependency-free Java test runner instead of JUnit. Run:
+Run the JUnit test suite from the project root:
 
 ```bash
-sh test.sh
+./gradlew test
 ```
 
-`test.sh` compiles `src/main/java` and `src/test/java`, then runs `luke.LukeTest`.
+`test.sh` is also available as a shortcut and delegates to `./gradlew test`.
 
 ## User guide
 
