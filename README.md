@@ -29,10 +29,20 @@ Prerequisites: JDK 25, update Intellij to the most recent version.
 Run Luke from the project root:
 
 ```bash
-sh run.sh
+./gradlew run
 ```
 
-`run.sh` compiles all source files into the `out` folder with `javac`, then starts `Luke`.
+To build a runnable JAR for release:
+
+```bash
+./gradlew jar
+```
+
+The release artifact is created at `build/lib/luke.jar`. Run it with:
+
+```bash
+java -jar build/lib/luke.jar
+```
 
 ## Running tests
 
@@ -41,8 +51,6 @@ Run the JUnit test suite from the project root:
 ```bash
 ./gradlew test
 ```
-
-`test.sh` is also available as a shortcut and delegates to `./gradlew test`.
 
 ## User guide
 

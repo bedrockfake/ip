@@ -8,7 +8,14 @@ Luke is a command-line chatbot for tracking tasks. It saves your task list to
 Run Luke from the project root:
 
 ```bash
-sh run.sh
+./gradlew run
+```
+
+To run the release JAR:
+
+```bash
+./gradlew jar
+java -jar build/lib/luke.jar
 ```
 
 You will see a prompt:
@@ -261,5 +268,3 @@ Run tests from the project root:
 ```bash
 ./gradlew test
 ```
-
-`test.sh` is also available as a shortcut and delegates to Gradle.
