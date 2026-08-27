@@ -133,6 +133,26 @@ public enum Commands implements Command {
         public boolean shouldSaveItemList() {
             return true;
         }
+    },
+
+    /** Finds tasks whose descriptions contain the given search text. */
+    FIND("find") {
+        @Override
+        public void execute(Luke bot, String argument, EnumMap<Flag, String> flags)
+                throws UserInputException {
+            requireNoFlags(flags);
+
+            if (argument.isBlank()) {
+                throw InvalidArgumentException.missing("find");
+            }
+
+            String matchingItems = bot.getItems().formatItemsMatchingName(argument);
+            if (matchingItems.isBlank()) {
+                bot.say("No matching tasks found.");
+            } else {
+                bot.say("Here are the matching tasks in your list:\n" + matchingItems);
+            }
+        }
     };
 
     /** The word the user types to trigger this command. */
