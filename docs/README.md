@@ -1,6 +1,7 @@
 # Luke User Guide
 
-Luke is a command-line chatbot for tracking tasks. It stores tasks only for the current run of the program; when the program exits, the list is not saved.
+Luke is a command-line chatbot for tracking tasks. It saves your task list to
+`data/itemlist.txt` so tasks are available the next time you run the program.
 
 ## Quick Start
 
@@ -26,6 +27,7 @@ Type one command per line. Use `bye` to exit.
 | `deadline` | `deadline DESCRIPTION /by TIME` | Adds a deadline task. |
 | `event` | `event DESCRIPTION /from START /to END` | Adds an event task. |
 | `list` | `list` | Shows all tasks. |
+| `list` | `list /sort time` | Shows tasks sorted by parseable date or time values. |
 | `mark` | `mark INDEX` | Marks a task as done. |
 | `unmark` | `unmark INDEX` | Marks a task as not done. |
 | `delete` | `delete INDEX` | Deletes a task. |
@@ -106,6 +108,24 @@ Example output:
 2. [D][ ] return book (by: Sunday)
 3. [E][ ] project meeting (from: Mon 2pm to: 4pm)
 ```
+
+Use `list /sort time` to show tasks with parseable date or time values first:
+
+```text
+list /sort time
+```
+
+Example sorted output:
+
+```text
+1. [E][ ] consultation (from: 4:00 PM to: 5:00 PM)
+2. [D][ ] submit report (by: Dec 2 2019 6:00 PM)
+3. [T][ ] read book
+4. [D][ ] return book (by: Sunday)
+```
+
+Tasks with parseable values are sorted from earliest to latest. Tasks without a
+parseable date or time stay after them in their original order.
 
 Task display format:
 
@@ -205,6 +225,7 @@ Luke reports user input problems as normal chatbot errors. Common examples:
 | `deadline return book /by Sunday /by Monday` | `Duplicate flag: /by` |
 | `deadline return book /er idk` | `Unidentified flag: /er` |
 | `todo read book /by Sunday` | `Unsupported flag: /by` |
+| `list /sort name` | `Unsupported value for /sort: name` |
 | `mark banana` | `` `mark` command received invalid index: banana `` |
 | `mark 999` | `` `mark` command received out-of-bounds index: 999 `` |
 | `delete 999` | `` `delete` command received out-of-bounds index: 999 `` |
@@ -222,6 +243,7 @@ Important classes:
 | `luke/Luke.java` | Reads user input, parses commands and flags, and displays errors. |
 | `luke/commands/Commands.java` | Defines non-task commands such as `list`, `mark`, `unmark`, `delete`, and `bye`. |
 | `luke/commands/AddTaskCommands.java` | Validates and adds todo, deadline, and event tasks. |
+| `luke/datetime/DateTimeParser.java` | Formats supported date and time values. |
 | `luke/tasks/TaskTypes.java` | Defines task-creation keywords and their required flags. |
 | `luke/tasks/ItemList.java` | Stores tasks and formats them for display. |
 | `luke/storage/ItemListStorage.java` | Handles loading and saving the task list. |
@@ -229,7 +251,9 @@ Important classes:
 
 ### Tests
 
-Tests are in `src/test/java/luke/LukeTest.java`. They run the full command-line program with scripted input and check the printed output.
+Tests are in `src/test/java/luke`. `LukeTest.java` runs the suite,
+`LukeCliTest.java` checks the full command-line program with scripted input,
+and `DateTimeParserTest.java` checks date/time formatting behavior.
 
 Run tests from the project root:
 
