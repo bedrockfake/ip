@@ -64,6 +64,26 @@ final class LukeValidationTest {
     }
 
     @Test
+    void rejectsMissingFindArguments() {
+        String output = TestSupport.runLuke("""
+                find
+                bye
+                """);
+
+        TestSupport.assertContains(output, "`find` command requires an argument.");
+    }
+
+    @Test
+    void rejectsFlagsForFindCommand() {
+        String output = TestSupport.runLuke("""
+                find book /sort time
+                bye
+                """);
+
+        TestSupport.assertContains(output, "Unsupported flag: /sort");
+    }
+
+    @Test
     void rejectsSortFlagForTaskCommands() {
         String output = TestSupport.runLuke("""
                 todo read book /sort time
