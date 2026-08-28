@@ -35,6 +35,7 @@ Type one command per line. Use `bye` to exit.
 | `event` | `event DESCRIPTION /from START /to END` | Adds an event task. |
 | `list` | `list` | Shows all tasks. |
 | `list` | `list /sort time` | Shows tasks sorted by parseable date or time values. |
+| `find` | `find SEARCH_TEXT` | Shows tasks whose descriptions contain the search text. |
 | `mark` | `mark INDEX` | Marks a task as done. |
 | `unmark` | `unmark INDEX` | Marks a task as not done. |
 | `delete` | `delete INDEX` | Deletes a task. |
@@ -133,6 +134,24 @@ Example sorted output:
 
 Tasks with parseable values are sorted from earliest to latest. Tasks without a
 parseable date or time stay after them in their original order.
+
+## Finding Tasks
+
+Use `find` followed by search text:
+
+```text
+find book
+```
+
+Example output:
+
+```text
+Here are the matching tasks in your list:
+1. [T][ ] read book
+2. [D][ ] return book (by: Sunday)
+```
+
+Search is case-insensitive and ignores repeated spaces.
 
 Task display format:
 
@@ -233,6 +252,8 @@ Luke reports user input problems as normal chatbot errors. Common examples:
 | `deadline return book /er idk` | `Unidentified flag: /er` |
 | `todo read book /by Sunday` | `Unsupported flag: /by` |
 | `list /sort name` | `Unsupported value for /sort: name` |
+| `find` | `` `find` command requires an argument. `` |
+| `find book /sort time` | `Unsupported flag: /sort` |
 | `mark banana` | `` `mark` command received invalid index: banana `` |
 | `mark 999` | `` `mark` command received out-of-bounds index: 999 `` |
 | `delete 999` | `` `delete` command received out-of-bounds index: 999 `` |

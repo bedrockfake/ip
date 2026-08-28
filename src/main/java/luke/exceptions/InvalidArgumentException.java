@@ -31,6 +31,17 @@ public class InvalidArgumentException extends UserInputException {
     }
 
     /**
+     * Creates an error for commands that require argument text.
+     *
+     * @param command command that expected an argument
+     * @return formatted argument exception
+     */
+    public static InvalidArgumentException missing(String command) {
+        return new InvalidArgumentException(
+                "`%s` command requires an argument.".formatted(command));
+    }
+
+    /**
      * Creates an error for index commands where the argument is not a number.
      *
      * @param command command that expected an index

@@ -121,6 +121,44 @@ final class LukeCliTest {
     }
 
     @Test
+    void findsTasksByDescription() {
+        String output = TestSupport.runLuke("""
+                todo read book
+                deadline return book /by Sunday
+                event project meeting /from Mon 2pm /to 4pm
+                find book
+                bye
+                """);
+
+        TestSupport.assertContains(output, "Here are the matching tasks in your list:");
+        TestSupport.assertContains(output, "1. [T][ ] read book");
+        TestSupport.assertContains(output, "2. [D][ ] return book (by: Sunday)");
+    }
+
+    @Test
+    void findsTasksWithCaseAndWhitespaceLeniency() {
+        String output = TestSupport.runLuke("""
+                todo read   CS notes
+                todo read book
+                find READ cs
+                bye
+                """);
+
+        TestSupport.assertContains(output, "1. [T][ ] read   CS notes");
+    }
+
+    @Test
+    void reportsNoMatchingTasks() {
+        String output = TestSupport.runLuke("""
+                todo read book
+                find homework
+                bye
+                """);
+
+        TestSupport.assertContains(output, "No matching tasks found.");
+    }
+
+    @Test
     void showsPlaceholderForEmptyList() {
         String output = TestSupport.runLuke("""
                 list

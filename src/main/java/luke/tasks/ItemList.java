@@ -229,10 +229,22 @@ public class ItemList {
     }
 
     /**
-     * Returns the original indexes of all stored items.
+     * Returns items whose descriptions contain the search text.
      *
-     * @return item indexes in insertion order
+     * @param searchText text to search for
+     * @return matching items formatted as a numbered list
      */
+    public String formatItemsMatchingName(String searchText) {
+        List<Integer> matchingIndexes = new ArrayList<>();
+        String normalizedSearchText = normalizeForSearch(searchText);
+        for (int i = 0; i < items.size(); i++) {
+            if (normalizeForSearch(items.get(i).name).contains(normalizedSearchText)) {
+                matchingIndexes.add(i);
+            }
+        }
+        return formatNumberedItems(matchingIndexes);
+    }
+
     private List<Integer> rangeIndexes() {
         List<Integer> indexes = new ArrayList<>();
         for (int i = 0; i < items.size(); i++) {
@@ -272,5 +284,9 @@ public class ItemList {
             }
         }
         return LocalDateTime.MAX;
+    }
+
+    private String normalizeForSearch(String text) {
+        return text.trim().toLowerCase().replaceAll("\\s+", " ");
     }
 }
