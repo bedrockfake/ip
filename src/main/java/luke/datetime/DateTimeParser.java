@@ -118,21 +118,45 @@ public final class DateTimeParser {
         return null;
     }
 
+    /**
+     * Formats the value as a date-time if it matches a supported pattern.
+     *
+     * @param value text to parse
+     * @return formatted date-time text, or {@code null} if the value is not recognized
+     */
     private static String formatDateTime(String value) {
         LocalDateTime parsedDateTime = parseDateTime(value);
         return parsedDateTime == null ? null : parsedDateTime.format(DISPLAY_DATE_TIME);
     }
 
+    /**
+     * Formats the value as a date if it matches a supported pattern.
+     *
+     * @param value text to parse
+     * @return formatted date text, or {@code null} if the value is not recognized
+     */
     private static String formatDate(String value) {
         LocalDate parsedDate = parseDate(value);
         return parsedDate == null ? null : parsedDate.format(DISPLAY_DATE);
     }
 
+    /**
+     * Formats the value as a time if it matches a supported pattern.
+     *
+     * @param value text to parse
+     * @return formatted time text, or {@code null} if the value is not recognized
+     */
     private static String formatTime(String value) {
         LocalTime parsedTime = parseTime(value);
         return parsedTime == null ? null : parsedTime.format(DISPLAY_TIME);
     }
 
+    /**
+     * Parses a supported date-time value.
+     *
+     * @param value text to parse
+     * @return parsed date-time, or {@code null} if the value is not recognized
+     */
     private static LocalDateTime parseDateTime(String value) {
         for (DateTimeFormatter formatter : INPUT_DATE_TIMES) {
             try {
@@ -144,6 +168,12 @@ public final class DateTimeParser {
         return null;
     }
 
+    /**
+     * Parses a supported date value.
+     *
+     * @param value text to parse
+     * @return parsed date, or {@code null} if the value is not recognized
+     */
     private static LocalDate parseDate(String value) {
         for (DateTimeFormatter formatter : INPUT_DATES) {
             try {
@@ -155,6 +185,12 @@ public final class DateTimeParser {
         return null;
     }
 
+    /**
+     * Parses a supported time value.
+     *
+     * @param value text to parse
+     * @return parsed time, or {@code null} if the value is not recognized
+     */
     private static LocalTime parseTime(String value) {
         for (DateTimeFormatter formatter : INPUT_TIMES) {
             try {

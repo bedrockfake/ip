@@ -228,6 +228,11 @@ public class ItemList {
         return formatNumberedItems(sortedIndexes);
     }
 
+    /**
+     * Returns the original indexes of all stored items.
+     *
+     * @return item indexes in insertion order
+     */
     private List<Integer> rangeIndexes() {
         List<Integer> indexes = new ArrayList<>();
         for (int i = 0; i < items.size(); i++) {
@@ -236,6 +241,12 @@ public class ItemList {
         return indexes;
     }
 
+    /**
+     * Formats selected item indexes as a numbered list.
+     *
+     * @param itemIndexes item indexes in the order they should be displayed
+     * @return selected items formatted as numbered lines
+     */
     private String formatNumberedItems(List<Integer> itemIndexes) {
         List<String> lines = new ArrayList<>();
         for (int i = 0; i < itemIndexes.size(); i++) {
@@ -247,6 +258,12 @@ public class ItemList {
         return String.join("\n", lines);
     }
 
+    /**
+     * Returns the first parseable date/time flag value of the item.
+     *
+     * @param itemIndex 0-based index of the item
+     * @return parsed sort key, or {@link LocalDateTime#MAX} if none is parseable
+     */
     private LocalDateTime getTimeSortKey(int itemIndex) {
         for (String value : items.get(itemIndex).flags.values()) {
             LocalDateTime sortKey = DateTimeParser.parseSortKey(value);

@@ -71,6 +71,11 @@ public class AddTaskCommands implements Command {
         return true;
     }
 
+    /**
+     * Formats date/time flag values while preserving unrecognized values.
+     *
+     * @param flags parsed flag values to update
+     */
     private static void formatDateTimeFlags(EnumMap<Flag, String> flags) {
         for (Flag flag : flags.keySet()) {
             flags.put(flag, DateTimeParser.formatDateOrTimeFromFlag(flags.get(flag)));

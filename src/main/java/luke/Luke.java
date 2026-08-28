@@ -61,10 +61,16 @@ public class Luke {
         return items;
     }
 
+    /**
+     * Prints the divider used between chatbot interactions.
+     */
     private static void printHorizontalLine() {
         System.out.println("-".repeat(60));
     }
 
+    /**
+     * Prints the Luke banner shown when the chatbot starts.
+     */
     private static void printBanner() {
         String banner = " _         _        \n"
                 + "| |  _   _| | _____ \n"
@@ -96,6 +102,9 @@ public class Luke {
         printHorizontalLine();
     }
 
+    /**
+     * Prints the startup banner and greeting.
+     */
     private void greet() {
         printBanner();
         say("Hello! I'm %s.\nWhat can I do for you?".formatted(CHATBOT_NAME));
@@ -109,6 +118,13 @@ public class Luke {
         private final String argument;
         private final EnumMap<Flag, String> flags;
 
+        /**
+         * Creates a parsed invocation.
+         *
+         * @param command command to run
+         * @param argument argument text after the command keyword
+         * @param flags parsed command flags
+         */
         Invocation(Command command, String argument, EnumMap<Flag, String> flags) {
             this.command = command;
             this.argument = argument;
@@ -145,6 +161,13 @@ public class Luke {
         private final int start;
         private final int valueStart;
 
+        /**
+         * Creates a record of one flag found in the raw argument text.
+         *
+         * @param keyword flag keyword without the leading slash
+         * @param start position where the flag starts
+         * @param valueStart position where the flag value starts
+         */
         FlagMatch(String keyword, int start, int valueStart) {
             this.keyword = keyword;
             this.start = start;
