@@ -44,7 +44,7 @@ public class AddTaskCommands implements Command {
         if (argument.isBlank()) {
             throw InvalidArgumentException.missingDescription(taskType.toString().toLowerCase());
         }
-        
+
         for (Flag flag : flags.keySet()) {
             if (!taskType.getFlags().contains(flag)) {
                 throw InvalidFlagException.unsupported(flag.name().toLowerCase());

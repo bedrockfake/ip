@@ -100,9 +100,9 @@ public final class ItemListStorage {
             TaskTypes taskType = itemList.getTaskType(i);
             EnumMap<Flag, String> flags = itemList.getFlags(i);
             List<String> fields = new ArrayList<>(List.of(
-                taskType.name(),
-                itemList.isDone(i) ? "1" : "0",
-                itemList.getName(i)
+                    taskType.name(),
+                    itemList.isDone(i) ? "1" : "0",
+                    itemList.getName(i)
             ));
             for (Flag flag : taskType.getFlags()) {
                 fields.add(flags.get(flag));
