@@ -15,7 +15,7 @@ import luke.tasks.TaskTypes;
  * reused for todos, deadlines, and events because they share the same add flow:
  * validate the description, validate flags, add to the list, and show feedback.
  */
-public class AddTaskCommands implements Command {
+public class AddTaskCommand implements Command {
     private final TaskTypes taskType;
 
     /**
@@ -23,7 +23,7 @@ public class AddTaskCommands implements Command {
      *
      * @param taskType the task type this command should create
      */
-    public AddTaskCommands(TaskTypes taskType) {
+    public AddTaskCommand(TaskTypes taskType) {
         this.taskType = taskType;
     }
 

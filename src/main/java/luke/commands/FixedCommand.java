@@ -10,20 +10,20 @@ import luke.tasks.Flag;
 import luke.tasks.ItemList;
 
 /**
- * All the commands the chatbot understands, in one place. Each constant carries
- * the keyword that triggers it and provides its own {@link Command#execute} body,
- * so a command's keyword and behavior live together. Looking a keyword up is done
- * here via {@link #findByKeyword}, so the rest of the program has no second list to
- * keep in sync.
+ * Represents a command with behavior defined directly by an enum constant. Each
+ * constant carries the keyword that triggers it and provides its own
+ * {@link Command#execute} body, so a command's keyword and behavior live together.
+ * Looking a keyword up is done here via {@link #findByKeyword}, so the rest of the
+ * program has no second list to keep in sync.
  */
-public enum Commands implements Command {
+public enum FixedCommand implements Command {
     /** Says goodbye and ends the program. */
     BYE("bye") {
         @Override
         public void execute(Luke bot, String argument, EnumMap<Flag, String> flags)
                 throws UserInputException {
-            requireNoArgument("bye", argument);
-            requireNoFlags(flags);
+            rejectUnexpectedArgument("bye", argument);
+            rejectUnsupportedFlags(flags);
             bot.say("Bye. Hope to see you again soon!");
         }
 
@@ -38,8 +38,8 @@ public enum Commands implements Command {
         @Override
         public void execute(Luke bot, String argument, EnumMap<Flag, String> flags)
                 throws UserInputException {
-            requireNoArgument("list", argument);
-            requireOnlySortFlag(flags);
+            rejectUnexpectedArgument("list", argument);
+            rejectUnsupportedListSortFlags(flags);
 
             ItemList items = bot.getItems();
             if (items.isEmpty()) {
@@ -57,7 +57,7 @@ public enum Commands implements Command {
         @Override
         public void execute(Luke bot, String argument, EnumMap<Flag, String> flags)
                 throws UserInputException {
-            requireNoFlags(flags);
+            rejectUnsupportedFlags(flags);
 
             try {
                 int itemIndex = Integer.parseInt(argument) - 1; // 1-based to 0-based
@@ -84,7 +84,7 @@ public enum Commands implements Command {
         @Override
         public void execute(Luke bot, String argument, EnumMap<Flag, String> flags)
                 throws UserInputException {
-            requireNoFlags(flags);
+            rejectUnsupportedFlags(flags);
 
             try {
                 int itemIndex = Integer.parseInt(argument) - 1; // 1-based to 0-based
@@ -111,7 +111,7 @@ public enum Commands implements Command {
         @Override
         public void execute(Luke bot, String argument, EnumMap<Flag, String> flags)
                 throws UserInputException {
-            requireNoFlags(flags);
+            rejectUnsupportedFlags(flags);
 
             try {
                 int itemIndex = Integer.parseInt(argument) - 1; // 1-based to 0-based
@@ -140,7 +140,7 @@ public enum Commands implements Command {
         @Override
         public void execute(Luke bot, String argument, EnumMap<Flag, String> flags)
                 throws UserInputException {
-            requireNoFlags(flags);
+            rejectUnsupportedFlags(flags);
 
             if (argument.isBlank()) {
                 throw InvalidArgumentException.missing("find");
@@ -158,7 +158,7 @@ public enum Commands implements Command {
     /** The word the user types to trigger this command. */
     private final String keyword;
 
-    Commands(String keyword) {
+    FixedCommand(String keyword) {
         this.keyword = keyword;
     }
 
@@ -169,7 +169,7 @@ public enum Commands implements Command {
      * @param argument the text after the command keyword
      * @throws InvalidArgumentException if {@code argument} is not blank
      */
-    private static void requireNoArgument(String command, String argument)
+    private static void rejectUnexpectedArgument(String command, String argument)
             throws InvalidArgumentException {
         if (!argument.isBlank()) {
             throw InvalidArgumentException.unexpected(command, argument);
@@ -182,7 +182,7 @@ public enum Commands implements Command {
      * @param flags parsed flags from the user input
      * @throws InvalidFlagException if any flag is present
      */
-    private static void requireNoFlags(EnumMap<Flag, String> flags)
+    private static void rejectUnsupportedFlags(EnumMap<Flag, String> flags)
             throws InvalidFlagException {
         if (!flags.isEmpty()) {
             Flag flag = flags.keySet().iterator().next();
@@ -196,7 +196,7 @@ public enum Commands implements Command {
      * @param flags parsed flags from the user input
      * @throws InvalidFlagException if the sort flag is invalid or another flag is present
      */
-    private static void requireOnlySortFlag(EnumMap<Flag, String> flags)
+    private static void rejectUnsupportedListSortFlags(EnumMap<Flag, String> flags)
             throws InvalidFlagException {
         if (flags.isEmpty()) {
             return;
@@ -224,7 +224,7 @@ public enum Commands implements Command {
      * @return the matching command, or {@code null} if none matches
      */
     public static Command findByKeyword(String word) {
-        for (Commands command : values()) {
+        for (FixedCommand command : values()) {
             if (word.equalsIgnoreCase(command.keyword)) {
                 return command;
             }

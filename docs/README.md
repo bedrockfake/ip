@@ -269,8 +269,8 @@ Important classes:
 | File | Purpose |
 | --- | --- |
 | `luke/Luke.java` | Reads user input, parses commands and flags, and displays errors. |
-| `luke/commands/Commands.java` | Defines non-task commands such as `list`, `mark`, `unmark`, `delete`, and `bye`. |
-| `luke/commands/AddTaskCommands.java` | Validates and adds todo, deadline, and event tasks. |
+| `luke/commands/FixedCommand.java` | Defines fixed commands such as `list`, `mark`, `unmark`, `delete`, and `bye`. |
+| `luke/commands/AddTaskCommand.java` | Validates and adds todo, deadline, and event tasks. |
 | `luke/datetime/DateTimeParser.java` | Formats supported date and time values. |
 | `luke/tasks/TaskTypes.java` | Defines task-creation keywords and their required flags. |
 | `luke/tasks/ItemList.java` | Stores tasks and formats them for display. |

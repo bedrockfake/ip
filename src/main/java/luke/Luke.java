@@ -7,9 +7,9 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import luke.commands.AddTaskCommands;
+import luke.commands.AddTaskCommand;
 import luke.commands.Command;
-import luke.commands.Commands;
+import luke.commands.FixedCommand;
 import luke.exceptions.InvalidArgumentException;
 import luke.exceptions.InvalidCommandException;
 import luke.exceptions.InvalidFlagException;
@@ -136,18 +136,18 @@ public class Luke {
      * Resolves the first word of an input line into a command.
      *
      * @param keyword the first word typed by the user
-     * @return a built-in command or a task-creation command
+     * @return a fixed command or a task-creation command
      * @throws InvalidCommandException if the keyword is not recognized
      */
     private Command parseCommand(String keyword) throws InvalidCommandException {
-        Command command = Commands.findByKeyword(keyword);
+        Command command = FixedCommand.findByKeyword(keyword);
         if (command != null) {
             return command;
         }
 
         TaskTypes taskType = TaskTypes.findByKeyword(keyword);
         if (taskType != null) {
-            return new AddTaskCommands(taskType);
+            return new AddTaskCommand(taskType);
         }
 
         throw new InvalidCommandException(keyword);

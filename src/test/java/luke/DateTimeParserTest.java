@@ -12,7 +12,7 @@ import luke.datetime.DateTimeParser;
  */
 final class DateTimeParserTest {
     @Test
-    void formatsSupportedDateValues() {
+    void formatDateOrTimeFromFlag_supportedDateValues() {
         TestSupport.assertEquals("Dec 2 2019", DateTimeParser.formatDateOrTimeFromFlag("2/12/2019"));
         TestSupport.assertEquals("Dec 2 2019", DateTimeParser.formatDateOrTimeFromFlag("2-12-2019"));
         TestSupport.assertEquals("Dec 2 2019", DateTimeParser.formatDateOrTimeFromFlag("2019-12-2"));
@@ -23,7 +23,7 @@ final class DateTimeParserTest {
     }
 
     @Test
-    void formatsSupportedDateTimeValues() {
+    void formatDateOrTimeFromFlag_supportedDateTimeValues() {
         TestSupport.assertEquals(
                 "Dec 2 2019 6:00 PM",
                 DateTimeParser.formatDateOrTimeFromFlag("2/12/2019 1800"));
@@ -56,7 +56,7 @@ final class DateTimeParserTest {
     }
 
     @Test
-    void formatsSupportedTimeValues() {
+    void formatDateOrTimeFromFlag_supportedTimeValues() {
         TestSupport.assertEquals("6:00 PM", DateTimeParser.formatDateOrTimeFromFlag("1800"));
         TestSupport.assertEquals("6:00 PM", DateTimeParser.formatDateOrTimeFromFlag("18:00"));
         TestSupport.assertEquals("12:00 AM", DateTimeParser.formatDateOrTimeFromFlag("12:00:00 AM"));
@@ -67,14 +67,14 @@ final class DateTimeParserTest {
     }
 
     @Test
-    void leavesUnsupportedDateTimeValuesUnchanged() {
+    void formatDateOrTimeFromFlag_unsupportedDateTimeValue_unchanged() {
         String formattedDateTime = DateTimeParser.formatDateOrTimeFromFlag("someday maybe");
 
         TestSupport.assertEquals("someday maybe", formattedDateTime);
     }
 
     @Test
-    void parsesSortableDateTimeValues() {
+    void parseSortKey_supportedDateTimeValues() {
         TestSupport.assertEquals(
                 LocalDateTime.of(2019, 12, 2, 18, 0),
                 DateTimeParser.parseSortKey("Dec 2 2019 6:00 PM"));
