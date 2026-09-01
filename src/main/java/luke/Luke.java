@@ -33,8 +33,8 @@ public class Luke {
     // "start coloring text" / "stop coloring text" rather than printing them.
     // We use them to make the bot's replies visually distinct from what you type.
     private static final String DEFAULT_BOT_COLOR = "\u001B[36m"; // cyan
-    private static final String ERROR_BOT_COLOR = "\u001B[31m";   // red
-    private static final String RESET_BOT_COLOR = "\u001B[0m";    // back to normal
+    private static final String ERROR_BOT_COLOR = "\u001B[31m"; // red
+    private static final String RESET_BOT_COLOR = "\u001B[0m"; // back to normal
 
     private final ItemList items;
 
