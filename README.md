@@ -61,3 +61,7 @@ For supported commands and examples, see [docs/README.md](docs/README.md).
 Codex was used to generate the unit tests and to write most of the user
 documentation and Javadocs. The generated content was reviewed and integrated
 into the project by the author.
+
+Codex was used to refactor code snippets to align with the Java Coding Standard.
+
+Codex was used to generate the JavaFX, images and .css for the GUI design.
