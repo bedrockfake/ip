@@ -51,8 +51,8 @@ public class ItemList {
             this.flags = flags;
         }
 
-        private void setCompletion(boolean done) {
-            this.completed = done ? Checkbox.DONE : Checkbox.NOT_DONE;
+        private void setCompletion(boolean isDone) {
+            this.completed = isDone ? Checkbox.DONE : Checkbox.NOT_DONE;
         }
     }
 
@@ -90,8 +90,8 @@ public class ItemList {
      * @param itemIndex 0-based index of the item (0 is the first item)
      * @param done     true to mark it done, false to mark it not done
      */
-    public void setCompletion(int itemIndex, boolean done) {
-        items.get(itemIndex).setCompletion(done);
+    public void setCompletion(int itemIndex, boolean isDone) {
+        items.get(itemIndex).setCompletion(isDone);
     }
 
     /**
