@@ -37,6 +37,8 @@ public class Luke {
     private static final String RESET_BOT_COLOR = "\u001B[0m"; // back to normal
 
     private final ItemList items;
+    private final StringBuilder responseBuffer = new StringBuilder();
+    private boolean shouldExit;
 
     /**
      * Creates a chatbot with the task list loaded from ItemListStorage.
@@ -59,6 +61,24 @@ public class Luke {
      */
     public ItemList getItems() {
         return items;
+    }
+
+    /**
+     * Returns the greeting shown when the chatbot starts.
+     *
+     * @return the startup greeting text
+     */
+    public String getWelcomeMessage() {
+        return "Hello! I'm %s.\nWhat can I do for you?".formatted(CHATBOT_NAME);
+    }
+
+    /**
+     * Returns whether the most recent command asked the chatbot to exit.
+     *
+     * @return true if Luke should stop accepting new input
+     */
+    public boolean shouldExit() {
+        return shouldExit;
     }
 
     /**
@@ -87,6 +107,7 @@ public class Luke {
      */
     public void say(String message) {
         message = message.strip(); // strip trailing \n
+        responseBuffer.append(message).append(System.lineSeparator());
         System.out.println(DEFAULT_BOT_COLOR + message + RESET_BOT_COLOR);
         printHorizontalLine();
     }
@@ -98,6 +119,7 @@ public class Luke {
      */
     public void error(String message) {
         message = message.strip(); // strip trailing \n
+        responseBuffer.append(message).append(System.lineSeparator());
         System.out.println(ERROR_BOT_COLOR + message + RESET_BOT_COLOR);
         printHorizontalLine();
     }
@@ -107,7 +129,7 @@ public class Luke {
      */
     private void greet() {
         printBanner();
-        say("Hello! I'm %s.\nWhat can I do for you?".formatted(CHATBOT_NAME));
+        say(getWelcomeMessage());
     }
 
     /**
@@ -234,6 +256,51 @@ public class Luke {
     }
 
     /**
+     * Runs one line of user input and returns the chatbot's reply.
+     *
+     * @param input the raw text typed by the user
+     * @return Luke's reply to display in the GUI
+     */
+    public String getResponse(String input) {
+        responseBuffer.setLength(0);
+
+        String line = input.strip();
+        if (line.isEmpty()) {
+            return "";
+        }
+
+        try {
+            executeLine(line);
+        } catch (UserInputException e) {
+            this.error(e.getMessage());
+        }
+
+        return responseBuffer.toString().strip();
+    }
+
+    /**
+     * Parses and executes one non-empty line of user input.
+     *
+     * @param line the stripped user input line
+     * @throws UserInputException if the line cannot be parsed or executed
+     */
+    private void executeLine(String line) throws UserInputException {
+        if (line.chars().anyMatch(Character::isISOControl)) {
+            throw InvalidArgumentException.unsupportedControlCharacter();
+        }
+        Invocation invocation = parseUserInput(line);
+        invocation.command.execute(this, invocation.argument, invocation.flags);
+        if (invocation.command.shouldSaveItemList()) {
+            try {
+                ItemListStorage.save(items);
+            } catch (StorageException e) {
+                this.error(e.getMessage());
+            }
+        }
+        shouldExit = invocation.command.shouldExit();
+    }
+
+    /**
      * Reads and runs commands until the user exits or the input ends.
      */
     private void run() {
@@ -251,19 +318,8 @@ public class Luke {
             }
 
             try {
-                if (line.chars().anyMatch(Character::isISOControl)) {
-                    throw InvalidArgumentException.unsupportedControlCharacter();
-                }
-                Invocation invocation = parseUserInput(line);
-                invocation.command.execute(this, invocation.argument, invocation.flags);
-                if (invocation.command.shouldSaveItemList()) {
-                    try {
-                        ItemListStorage.save(items);
-                    } catch (StorageException e) {
-                        this.error(e.getMessage());
-                    }
-                }
-                if (invocation.command.shouldExit()) {
+                executeLine(line);
+                if (shouldExit) {
                     return;
                 }
             } catch (UserInputException e) {
