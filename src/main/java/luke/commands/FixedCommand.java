@@ -59,18 +59,12 @@ public enum FixedCommand implements Command {
                 throws UserInputException {
             rejectUnsupportedFlags(flags);
 
-            try {
-                int itemIndex = Integer.parseInt(argument) - 1; // 1-based to 0-based
-                ItemList items = bot.getItems();
-                items.setCompletion(itemIndex, true);
-                bot.say("Nice! I've marked this task as done:\n %s".formatted(
-                        items.formatOneItem(itemIndex)
-                ));
-            } catch (NumberFormatException e) {
-                throw InvalidArgumentException.invalidIndex("mark", argument);
-            } catch (IndexOutOfBoundsException e) {
-                throw InvalidArgumentException.outOfBoundsIndex("mark", argument);
-            }
+            int itemIndex = getExistingItemIndex("mark", argument, bot.getItems());
+            ItemList items = bot.getItems();
+            items.setCompletion(itemIndex, true);
+            bot.say("Nice! I've marked this task as done:\n %s".formatted(
+                    items.formatOneItem(itemIndex)
+            ));
         }
 
         @Override
@@ -86,18 +80,12 @@ public enum FixedCommand implements Command {
                 throws UserInputException {
             rejectUnsupportedFlags(flags);
 
-            try {
-                int itemIndex = Integer.parseInt(argument) - 1; // 1-based to 0-based
-                ItemList items = bot.getItems();
-                items.setCompletion(itemIndex, false);
-                bot.say("OK! I've marked this task as not done yet:\n %s".formatted(
-                        items.formatOneItem(itemIndex)
-                ));
-            } catch (NumberFormatException e) {
-                throw InvalidArgumentException.invalidIndex("unmark", argument);
-            } catch (IndexOutOfBoundsException e) {
-                throw InvalidArgumentException.outOfBoundsIndex("unmark", argument);
-            }
+            int itemIndex = getExistingItemIndex("unmark", argument, bot.getItems());
+            ItemList items = bot.getItems();
+            items.setCompletion(itemIndex, false);
+            bot.say("OK! I've marked this task as not done yet:\n %s".formatted(
+                    items.formatOneItem(itemIndex)
+            ));
         }
 
         @Override
@@ -113,20 +101,14 @@ public enum FixedCommand implements Command {
                 throws UserInputException {
             rejectUnsupportedFlags(flags);
 
-            try {
-                int itemIndex = Integer.parseInt(argument) - 1; // 1-based to 0-based
-                ItemList items = bot.getItems();
-                String removedItem = items.formatOneItem(itemIndex);
-                items.remove(itemIndex);
-                bot.say("Noted. I've removed this task:\n"
-                        + " %s\n".formatted(removedItem)
-                        + "Now you have %d tasks in the list.".formatted(items.size())
-                );
-            } catch (NumberFormatException e) {
-                throw InvalidArgumentException.invalidIndex("delete", argument);
-            } catch (IndexOutOfBoundsException e) {
-                throw InvalidArgumentException.outOfBoundsIndex("delete", argument);
-            }
+            int itemIndex = getExistingItemIndex("delete", argument, bot.getItems());
+            ItemList items = bot.getItems();
+            String removedItem = items.formatOneItem(itemIndex);
+            items.remove(itemIndex);
+            bot.say("Noted. I've removed this task:\n"
+                    + " %s\n".formatted(removedItem)
+                    + "Now you have %d tasks in the list.".formatted(items.size())
+            );
         }
 
         @Override
@@ -215,6 +197,30 @@ public enum FixedCommand implements Command {
         if (!flags.get(Flag.SORT).equalsIgnoreCase("time")) {
             throw InvalidFlagException.unsupportedValue("sort", flags.get(Flag.SORT));
         }
+    }
+
+    /**
+     * Converts the user's 1-based task number into a valid item-list index.
+     *
+     * @param command the command name used in the error message
+     * @param argument the text that should contain the task number
+     * @param items the task list to check against
+     * @return the matching 0-based item index
+     * @throws InvalidArgumentException if the argument is not a valid existing item number
+     */
+    private static int getExistingItemIndex(String command, String argument, ItemList items)
+            throws InvalidArgumentException {
+        int itemIndex;
+        try {
+            itemIndex = Integer.parseInt(argument) - 1; // User-facing indexes start from 1.
+        } catch (NumberFormatException e) {
+            throw InvalidArgumentException.invalidIndex(command, argument);
+        }
+
+        if (itemIndex < 0 || itemIndex >= items.size()) {
+            throw InvalidArgumentException.outOfBoundsIndex(command, argument);
+        }
+        return itemIndex;
     }
 
     /**
