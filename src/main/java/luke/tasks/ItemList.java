@@ -88,7 +88,7 @@ public class ItemList {
      * Marks the item at the given position as done or not done.
      *
      * @param itemIndex 0-based index of the item (0 is the first item)
-     * @param done     true to mark it done, false to mark it not done
+     * @param isDone  true to mark it done, false to mark it not done
      */
     public void setCompletion(int itemIndex, boolean isDone) {
         items.get(itemIndex).setCompletion(isDone);
