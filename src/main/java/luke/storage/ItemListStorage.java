@@ -99,6 +99,8 @@ public final class ItemListStorage {
         for (int i = 0; i < itemList.size(); i++) {
             TaskTypes taskType = itemList.getTaskType(i);
             EnumMap<Flag, String> flags = itemList.getFlags(i);
+            assert flags.keySet().equals(taskType.getFlags())
+                    : "Stored item flags must match task type requirements.";
             List<String> fields = new ArrayList<>(List.of(
                     taskType.name(),
                     itemList.isDone(i) ? "1" : "0",
@@ -155,6 +157,7 @@ public final class ItemListStorage {
             }
             flags.put(flag, value);
         }
+        assert fieldIndex == fields.length : "All storage fields should be consumed.";
         itemList.addLoadedItem(itemName, taskType, flags, isDone);
     }
 

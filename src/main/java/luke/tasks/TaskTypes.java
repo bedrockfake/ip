@@ -35,9 +35,12 @@ public enum TaskTypes {
     private final EnumSet<Flag> flags;
 
     TaskTypes(String keyword, Flag... flags) {
+        assert keyword != null && !keyword.isBlank() : "Task type keyword must be present.";
+        assert flags != null : "Task type flags must be provided.";
         this.keyword = keyword;
         this.flags = EnumSet.noneOf(Flag.class);
         Collections.addAll(this.flags, flags);
+        assert this.flags.size() == flags.length : "Task type flags should not contain duplicates.";
     }
 
     /**

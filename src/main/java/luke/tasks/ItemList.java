@@ -45,6 +45,10 @@ public class ItemList {
         private final EnumMap<Flag, String> flags;
 
         Item(String name, TaskTypes taskType, EnumMap<Flag, String> flags) {
+            assert name != null && !name.isBlank() : "Item requires a description.";
+            assert taskType != null : "Item requires a task type.";
+            assert flags != null : "Item requires a flag map.";
+            assert flags.keySet().equals(taskType.getFlags()) : "Item flags must match task type requirements.";
             this.name = name;
             this.taskType = taskType;
             this.completed = Checkbox.NOT_DONE;
@@ -72,6 +76,10 @@ public class ItemList {
      * @param flags flag values associated with the task
      */
     public void add(String name, TaskTypes taskType, EnumMap<Flag, String> flags) {
+        assert name != null && !name.isBlank() : "Cannot add an item without a description.";
+        assert taskType != null : "Cannot add an item without a task type.";
+        assert flags != null : "Cannot add an item without a flag map.";
+        assert flags.keySet().equals(taskType.getFlags()) : "Item flags must match task type requirements.";
         items.add(new Item(name, taskType, flags));
     }
 
@@ -166,6 +174,7 @@ public class ItemList {
             EnumMap<Flag, String> flags,
             boolean isDone) {
         add(name, taskType, flags);
+        assert size() > 0 : "Loaded item should have been added before marking completion.";
         setCompletion(size() - 1, isDone);
     }
 
@@ -260,8 +269,11 @@ public class ItemList {
      * @return selected items formatted as numbered lines
      */
     private String formatNumberedItems(List<Integer> itemIndexes) {
+        assert itemIndexes != null : "Item indexes must be provided.";
         List<String> lines = new ArrayList<>();
         for (int i = 0; i < itemIndexes.size(); i++) {
+            assert itemIndexes.get(i) >= 0 && itemIndexes.get(i) < items.size()
+                    : "Formatted item index should refer to an existing item.";
             lines.add("%d. %s".formatted(
                     i + 1,
                     formatOneItem(itemIndexes.get(i))
@@ -277,6 +289,7 @@ public class ItemList {
      * @return parsed sort key, or {@link LocalDateTime#MAX} if none is parseable
      */
     private LocalDateTime getTimeSortKey(int itemIndex) {
+        assert itemIndex >= 0 && itemIndex < items.size() : "Sort key index should refer to an existing item.";
         for (String value : items.get(itemIndex).flags.values()) {
             LocalDateTime sortKey = DateTimeParser.parseSortKey(value);
             if (sortKey != null) {

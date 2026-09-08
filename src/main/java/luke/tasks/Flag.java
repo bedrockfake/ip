@@ -19,6 +19,7 @@ public enum Flag {
     private final String keyword;
 
     Flag(String keyword) {
+        assert keyword != null && !keyword.isBlank() : "Flag keyword must be present.";
         this.keyword = keyword;
     }
 

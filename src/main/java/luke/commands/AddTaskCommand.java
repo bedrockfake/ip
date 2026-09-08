@@ -24,6 +24,7 @@ public class AddTaskCommand implements Command {
      * @param taskType the task type this command should create
      */
     public AddTaskCommand(TaskTypes taskType) {
+        assert taskType != null : "AddTaskCommand requires a task type.";
         this.taskType = taskType;
     }
 
@@ -41,6 +42,10 @@ public class AddTaskCommand implements Command {
             Luke bot,
             String argument,
             EnumMap<Flag, String> flags) throws UserInputException {
+        assert bot != null : "AddTaskCommand requires a chatbot.";
+        assert argument != null : "Command argument should be parsed as a string.";
+        assert flags != null : "Command flags should be parsed as a flag map.";
+
         if (argument.isBlank()) {
             throw InvalidArgumentException.missingDescription(taskType.toString().toLowerCase());
         }
@@ -56,10 +61,12 @@ public class AddTaskCommand implements Command {
                 throw InvalidFlagException.missingRequired(requiredFlag.name().toLowerCase());
             }
         }
+        assert hasRequiredFlags(flags) : "Required flags should be present after validation.";
         formatDateTimeFlags(flags);
 
         bot.getItems().add(argument, taskType, flags);
         int size = bot.getItems().size();
+        assert size > 0 : "Adding a task should leave the list non-empty.";
         bot.say("Got it. I've added this task:\n"
                 + "  %s\n".formatted(bot.getItems().formatOneItem(size - 1))
                 + "Now you have %d tasks in the list.".formatted(size)
@@ -80,5 +87,9 @@ public class AddTaskCommand implements Command {
         for (Flag flag : flags.keySet()) {
             flags.put(flag, DateTimeParser.formatDateOrTimeFromFlag(flags.get(flag)));
         }
+    }
+
+    private boolean hasRequiredFlags(EnumMap<Flag, String> flags) {
+        return flags.keySet().containsAll(taskType.getFlags());
     }
 }

@@ -148,6 +148,9 @@ public class Luke {
          * @param flags parsed command flags
          */
         Invocation(Command command, String argument, EnumMap<Flag, String> flags) {
+            assert command != null : "Invocation requires a command.";
+            assert argument != null : "Invocation requires an argument string.";
+            assert flags != null : "Invocation requires a flag map.";
             this.command = command;
             this.argument = argument;
             this.flags = flags;
@@ -191,6 +194,9 @@ public class Luke {
          * @param valueStart position where the flag value starts
          */
         FlagMatch(String keyword, int start, int valueStart) {
+            assert keyword != null && !keyword.isBlank() : "Flag keyword must be present.";
+            assert start >= 0 : "Flag start index must be non-negative.";
+            assert valueStart > start : "Flag value must start after the flag keyword.";
             this.keyword = keyword;
             this.start = start;
             this.valueStart = valueStart;
@@ -205,6 +211,8 @@ public class Luke {
      * @throws UserInputException if the command or flags are invalid
      */
     private Invocation parseUserInput(String line) throws UserInputException {
+        assert line != null && !line.isBlank() : "Parser expects non-empty user input.";
+        assert line.equals(line.strip()) : "Parser expects stripped user input.";
         String argument;
         EnumMap<Flag, String> flags = new EnumMap<>(Flag.class);
 
@@ -212,6 +220,7 @@ public class Luke {
         String[] parts = line.split(" ", 2);
         String keyword = parts[0];
         String rest = parts.length > 1 ? parts[1] : "";
+        assert !keyword.isBlank() : "Command keyword must be present.";
 
         Command command = parseCommand(keyword);
 
@@ -237,6 +246,7 @@ public class Luke {
                 int valueEnd = i + 1 < flagMatches.size()
                         ? flagMatches.get(i + 1).start
                         : rest.length();
+                assert flagMatch.valueStart <= valueEnd : "Flag matches should be ordered.";
                 String value = rest.substring(flagMatch.valueStart, valueEnd).trim();
                 Flag flag = Flag.findByKeyword(flagMatch.keyword);
 
@@ -285,6 +295,8 @@ public class Luke {
      * @throws UserInputException if the line cannot be parsed or executed
      */
     private void executeLine(String line) throws UserInputException {
+        assert line != null && !line.isBlank() : "Executor expects non-empty user input.";
+        assert line.equals(line.strip()) : "Executor expects stripped user input.";
         if (line.chars().anyMatch(Character::isISOControl)) {
             throw InvalidArgumentException.unsupportedControlCharacter();
         }
