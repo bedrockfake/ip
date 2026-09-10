@@ -34,6 +34,7 @@ Type one command per line. Use `bye` to exit.
 | `deadline` | `deadline DESCRIPTION /by TIME` | Adds a deadline task. |
 | `event` | `event DESCRIPTION /from START /to END` | Adds an event task. |
 | `list` | `list` | Shows all tasks. |
+| `list` | `list /sort alpha` | Shows tasks sorted alphabetically by description. |
 | `list` | `list /sort time` | Shows tasks sorted by parseable date or time values. |
 | `find` | `find SEARCH_TEXT` | Shows tasks whose descriptions contain the search text. |
 | `mark` | `mark INDEX` | Marks a task as done. |
@@ -115,6 +116,21 @@ Example output:
 1. [T][ ] read book
 2. [D][ ] return book (by: Sunday)
 3. [E][ ] project meeting (from: Mon 2pm to: 4pm)
+```
+
+Use `list /sort alpha` to sort tasks alphabetically by their descriptions.
+Sorting is case-insensitive:
+
+```text
+list /sort alpha
+```
+
+Example sorted output:
+
+```text
+1. [D][ ] apply for internship (by: Friday)
+2. [E][ ] project meeting (from: Mon 2pm to: 4pm)
+3. [T][ ] read book
 ```
 
 Use `list /sort time` to show tasks with parseable date or time values first:

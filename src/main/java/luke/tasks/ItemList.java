@@ -226,17 +226,34 @@ public class ItemList {
     }
 
     /**
-     * Returns the items sorted by parseable flag date/time values.
+     * Returns the items sorted by the requested criterion.
      *
+     * @param sortCriterion criterion used to order the items
      * @return all items formatted as a numbered list
      */
-    public String formatAllItemsSortedByTime() {
+    public String formatAllItemsSorted(SortCriterion sortCriterion) {
+        assert sortCriterion != null : "A sort criterion must be provided.";
         List<Integer> sortedIndexes = rangeIndexes().stream()
-                .sorted(Comparator
-                        .comparing(this::getTimeSortKey)
-                        .thenComparingInt(Integer::intValue))
+                .sorted(getItemComparator(sortCriterion))
                 .toList();
         return formatNumberedItems(sortedIndexes);
+    }
+
+    /**
+     * Returns the comparator for a supported task sort criterion. The original
+     * item index provides a stable tie-breaker for equal sort values.
+     *
+     * @param sortCriterion criterion used to order the items
+     * @return comparator for item indexes
+     */
+    private Comparator<Integer> getItemComparator(SortCriterion sortCriterion) {
+        Comparator<Integer> comparator = switch (sortCriterion) {
+            case ALPHA -> Comparator.comparing(
+                    index -> items.get(index).name,
+                    String.CASE_INSENSITIVE_ORDER);
+            case TIME -> Comparator.comparing(this::getTimeSortKey);
+        };
+        return comparator.thenComparingInt(Integer::intValue);
     }
 
     /**
