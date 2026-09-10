@@ -82,17 +82,17 @@ public class Main extends Application {
         Label subtitle = new Label("Local tasks - JavaFX");
         subtitle.setStyle(labelStyle(12, "normal", MUTED));
 
-        Label section = createTinyHeading("COMMANDS");
+        Label section = createTinyHeading("COMMANDS & USAGE");
         VBox commands = new VBox(8,
-                createCommandChip("todo"),
-                createCommandChip("deadline"),
-                createCommandChip("event"),
-                createCommandChip("list"),
-                createCommandChip("find"),
-                createCommandChip("mark"),
-                createCommandChip("unmark"),
-                createCommandChip("delete"),
-                createCommandChip("bye"));
+                createCommandChip("todo", "todo DESCRIPTION"),
+                createCommandChip("deadline", "deadline DESCRIPTION /by TIME"),
+                createCommandChip("event", "event DESCRIPTION /from START /to END"),
+                createCommandChip("list", "list [/sort alpha|time]"),
+                createCommandChip("find", "find SEARCH_TEXT"),
+                createCommandChip("mark", "mark INDEX"),
+                createCommandChip("unmark", "unmark INDEX"),
+                createCommandChip("delete", "delete INDEX"),
+                createCommandChip("bye", "bye"));
         ScrollPane commandList = createCommandList(commands);
 
         taskCount.setStyle(labelStyle(24, "bold", INK));
@@ -105,8 +105,8 @@ public class Main extends Application {
                 + "-fx-background-radius: 7px; -fx-padding: 10px;");
 
         VBox sidebar = new VBox(12, avatar, title, subtitle, section, commandList, taskPanel);
-        sidebar.setPrefWidth(210);
-        sidebar.setMinWidth(190);
+        sidebar.setPrefWidth(260);
+        sidebar.setMinWidth(230);
         sidebar.setStyle(shellPanelStyle());
         return sidebar;
     }
@@ -188,7 +188,7 @@ public class Main extends Application {
      * @return the input row
      */
     private HBox createInputArea() {
-        userInput.setPromptText("Enter command...");
+        userInput.setPromptText("Enter a command, e.g. todo read book");
         userInput.setStyle("-fx-background-color: white; -fx-background-radius: 6px; "
                 + "-fx-border-color: #e8cfa2; -fx-border-radius: 6px; -fx-padding: 12px; "
                 + "-fx-font-family: " + FONT + "; -fx-font-size: 13px;");
@@ -357,13 +357,20 @@ public class Main extends Application {
      * Creates a compact command reference row.
      *
      * @param command command keyword
+     * @param usage complete command syntax
      * @return the command row
      */
-    private HBox createCommandChip(String command) {
+    private VBox createCommandChip(String command, String usage) {
         Label keyword = createBadge(command, MINT, TEAL_DARK);
-        HBox row = new HBox(keyword);
+        Label usageText = new Label(usage);
+        usageText.setWrapText(true);
+        usageText.setMaxWidth(Double.MAX_VALUE);
+        usageText.setStyle(labelStyle(11, "normal", MUTED)
+                + "-fx-font-family: monospace;");
+
+        VBox row = new VBox(4, keyword, usageText);
         row.setAlignment(Pos.CENTER_LEFT);
-        row.setStyle("-fx-background-color: rgba(255, 250, 240, 0.75); -fx-padding: 6px; "
+        row.setStyle("-fx-background-color: rgba(255, 250, 240, 0.75); -fx-padding: 7px; "
                 + "-fx-background-radius: 5px;");
         return row;
     }
