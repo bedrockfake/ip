@@ -38,7 +38,8 @@ public final class ItemListStorage {
 
     /**
      * Returns the storage file path, creating its parent directory and file if
-     * they do not exist yet.
+     * they do not exist yet. An existing path must be a regular file so storage
+     * behavior remains consistent across operating systems.
      *
      * @param filePath path to Luke's storage file
      * @return existing storage file path
@@ -51,6 +52,9 @@ public final class ItemListStorage {
         }
         if (!Files.exists(path)) {
             Files.createFile(path);
+        }
+        if (!Files.isRegularFile(path)) {
+            throw new IOException("Storage path is not a regular file: " + path);
         }
         return path;
     }
