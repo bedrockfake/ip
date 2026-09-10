@@ -1,5 +1,6 @@
 package luke.tasks;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 
@@ -66,11 +67,9 @@ public enum TaskTypes {
      * @return the matching task type, or {@code null} if none matches
      */
     public static TaskTypes findByKeyword(String word) {
-        for (TaskTypes taskType : values()) {
-            if (word.equalsIgnoreCase(taskType.keyword)) {
-                return taskType;
-            }
-        }
-        return null;
+        return Arrays.stream(values())
+                .filter(taskType -> word.equalsIgnoreCase(taskType.keyword))
+                .findFirst()
+                .orElse(null);
     }
 }

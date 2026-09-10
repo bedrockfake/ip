@@ -1,5 +1,6 @@
 package luke.commands;
 
+import java.util.Arrays;
 import java.util.EnumMap;
 
 import luke.Luke;
@@ -230,11 +231,9 @@ public enum FixedCommand implements Command {
      * @return the matching command, or {@code null} if none matches
      */
     public static Command findByKeyword(String word) {
-        for (FixedCommand command : values()) {
-            if (word.equalsIgnoreCase(command.keyword)) {
-                return command;
-            }
-        }
-        return null;
+        return Arrays.stream(values())
+                .filter(command -> word.equalsIgnoreCase(command.keyword))
+                .findFirst()
+                .orElse(null);
     }
 }

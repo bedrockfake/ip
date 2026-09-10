@@ -1,5 +1,7 @@
 package luke.tasks;
 
+import java.util.Arrays;
+
 /**
  * Supported flag names that can appear after a task description.
  */
@@ -30,11 +32,9 @@ public enum Flag {
      * @return the matching flag, or {@code null} if none matches
      */
     public static Flag findByKeyword(String word) {
-        for (Flag flag : values()) {
-            if (word.equalsIgnoreCase(flag.keyword)) {
-                return flag;
-            }
-        }
-        return null;
+        return Arrays.stream(values())
+                .filter(flag -> word.equalsIgnoreCase(flag.keyword))
+                .findFirst()
+                .orElse(null);
     }
 }

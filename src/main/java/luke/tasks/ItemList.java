@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import luke.datetime.DateTimeParser;
 
@@ -230,10 +231,11 @@ public class ItemList {
      * @return all items formatted as a numbered list
      */
     public String formatAllItemsSortedByTime() {
-        List<Integer> sortedIndexes = rangeIndexes();
-        sortedIndexes.sort(Comparator
-                .comparing(this::getTimeSortKey)
-                .thenComparingInt(Integer::intValue));
+        List<Integer> sortedIndexes = rangeIndexes().stream()
+                .sorted(Comparator
+                        .comparing(this::getTimeSortKey)
+                        .thenComparingInt(Integer::intValue))
+                .toList();
         return formatNumberedItems(sortedIndexes);
     }
 
@@ -244,22 +246,18 @@ public class ItemList {
      * @return matching items formatted as a numbered list
      */
     public String formatItemsMatchingName(String searchText) {
-        List<Integer> matchingIndexes = new ArrayList<>();
         String normalizedSearchText = normalizeForSearch(searchText);
-        for (int i = 0; i < items.size(); i++) {
-            if (normalizeForSearch(items.get(i).name).contains(normalizedSearchText)) {
-                matchingIndexes.add(i);
-            }
-        }
+        List<Integer> matchingIndexes = rangeIndexes().stream()
+                .filter(index -> normalizeForSearch(items.get(index).name)
+                        .contains(normalizedSearchText))
+                .toList();
         return formatNumberedItems(matchingIndexes);
     }
 
     private List<Integer> rangeIndexes() {
-        List<Integer> indexes = new ArrayList<>();
-        for (int i = 0; i < items.size(); i++) {
-            indexes.add(i);
-        }
-        return indexes;
+        return IntStream.range(0, items.size())
+                .boxed()
+                .toList();
     }
 
     /**
@@ -270,16 +268,23 @@ public class ItemList {
      */
     private String formatNumberedItems(List<Integer> itemIndexes) {
         assert itemIndexes != null : "Item indexes must be provided.";
-        List<String> lines = new ArrayList<>();
-        for (int i = 0; i < itemIndexes.size(); i++) {
-            assert itemIndexes.get(i) >= 0 && itemIndexes.get(i) < items.size()
-                    : "Formatted item index should refer to an existing item.";
-            lines.add("%d. %s".formatted(
-                    i + 1,
-                    formatOneItem(itemIndexes.get(i))
-            ));
-        }
-        return String.join("\n", lines);
+        return IntStream.range(0, itemIndexes.size())
+                .mapToObj(position -> formatNumberedItem(position, itemIndexes))
+                .collect(Collectors.joining("\n"));
+    }
+
+    /**
+     * Formats one selected item with its position in the displayed results.
+     *
+     * @param position 0-based position in the displayed results
+     * @param itemIndexes item indexes in display order
+     * @return one numbered display line
+     */
+    private String formatNumberedItem(int position, List<Integer> itemIndexes) {
+        int itemIndex = itemIndexes.get(position);
+        assert itemIndex >= 0 && itemIndex < items.size()
+                : "Formatted item index should refer to an existing item.";
+        return "%d. %s".formatted(position + 1, formatOneItem(itemIndex));
     }
 
     /**
@@ -290,13 +295,11 @@ public class ItemList {
      */
     private LocalDateTime getTimeSortKey(int itemIndex) {
         assert itemIndex >= 0 && itemIndex < items.size() : "Sort key index should refer to an existing item.";
-        for (String value : items.get(itemIndex).flags.values()) {
-            LocalDateTime sortKey = DateTimeParser.parseSortKey(value);
-            if (sortKey != null) {
-                return sortKey;
-            }
-        }
-        return LocalDateTime.MAX;
+        return items.get(itemIndex).flags.values().stream()
+                .map(DateTimeParser::parseSortKey)
+                .filter(sortKey -> sortKey != null)
+                .findFirst()
+                .orElse(LocalDateTime.MAX);
     }
 
     private String normalizeForSearch(String text) {
