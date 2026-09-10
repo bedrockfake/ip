@@ -121,6 +121,22 @@ final class LukeCliTest {
     }
 
     @Test
+    void sortsListAlphabeticallyByTaskName() {
+        String output = TestSupport.runLuke("""
+                todo Zebra task
+                deadline apple task /by Sunday
+                event Banana task /from 4pm /to 5pm
+                list /sort alpha
+                bye
+                """);
+
+        TestSupport.assertContains(output, """
+                1. [D][ ] apple task (by: Sunday)
+                2. [E][ ] Banana task (from: 4:00 PM to: 5:00 PM)
+                3. [T][ ] Zebra task""");
+    }
+
+    @Test
     void findsTasksByDescription() {
         String output = TestSupport.runLuke("""
                 todo read book

@@ -9,6 +9,7 @@ import luke.exceptions.InvalidFlagException;
 import luke.exceptions.UserInputException;
 import luke.tasks.Flag;
 import luke.tasks.ItemList;
+import luke.tasks.SortCriterion;
 
 /**
  * Represents a command with behavior defined directly by an enum constant. Each
@@ -40,13 +41,13 @@ public enum FixedCommand implements Command {
         public void execute(Luke bot, String argument, EnumMap<Flag, String> flags)
                 throws UserInputException {
             rejectUnexpectedArgument("list", argument);
-            rejectUnsupportedListSortFlags(flags);
+            SortCriterion sortCriterion = parseListSortCriterion(flags);
 
             ItemList items = bot.getItems();
             if (items.isEmpty()) {
                 bot.say("No items added.");
-            } else if (flags.containsKey(Flag.SORT)) {
-                bot.say(items.formatAllItemsSortedByTime());
+            } else if (sortCriterion != null) {
+                bot.say(items.formatAllItemsSorted(sortCriterion));
             } else {
                 bot.say(items.formatAllItems());
             }
@@ -174,30 +175,32 @@ public enum FixedCommand implements Command {
     }
 
     /**
-     * Rejects flags other than {@code /sort time} for the list command.
+     * Parses the optional sort criterion for the list command.
      *
      * @param flags parsed flags from the user input
+     * @return the requested sort criterion, or {@code null} when sorting was not requested
      * @throws InvalidFlagException if the sort flag is invalid or another flag is present
      */
-    private static void rejectUnsupportedListSortFlags(EnumMap<Flag, String> flags)
+    private static SortCriterion parseListSortCriterion(EnumMap<Flag, String> flags)
             throws InvalidFlagException {
         if (flags.isEmpty()) {
-            return;
+            return null;
         }
-        if (!flags.containsKey(Flag.SORT)) {
-            Flag flag = flags.keySet().iterator().next();
-            throw InvalidFlagException.unsupported(flag.name().toLowerCase());
+
+        Flag unsupportedFlag = flags.keySet().stream()
+                .filter(flag -> flag != Flag.SORT)
+                .findFirst()
+                .orElse(null);
+        if (unsupportedFlag != null) {
+            throw InvalidFlagException.unsupported(unsupportedFlag.name().toLowerCase());
         }
-        if (flags.size() > 1) {
-            for (Flag flag : flags.keySet()) {
-                if (flag != Flag.SORT) {
-                    throw InvalidFlagException.unsupported(flag.name().toLowerCase());
-                }
-            }
+
+        String sortValue = flags.get(Flag.SORT);
+        SortCriterion sortCriterion = SortCriterion.findByKeyword(sortValue);
+        if (sortCriterion == null) {
+            throw InvalidFlagException.unsupportedValue("sort", sortValue);
         }
-        if (!flags.get(Flag.SORT).equalsIgnoreCase("time")) {
-            throw InvalidFlagException.unsupportedValue("sort", flags.get(Flag.SORT));
-        }
+        return sortCriterion;
     }
 
     /**
