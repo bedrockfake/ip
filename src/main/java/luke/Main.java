@@ -82,8 +82,22 @@ public class Main extends Application {
         Label subtitle = new Label("Local tasks - JavaFX");
         subtitle.setStyle(labelStyle(12, "normal", MUTED));
 
-        Label section = createTinyHeading("COMMANDS & USAGE");
-        VBox commands = new VBox(8,
+        VBox sidebar = new VBox(12, avatar, title, subtitle,
+                createTinyHeading("COMMANDS & USAGE"), createCommandList(createCommands()),
+                createTaskPanel());
+        sidebar.setPrefWidth(260);
+        sidebar.setMinWidth(230);
+        sidebar.setStyle(shellPanelStyle());
+        return sidebar;
+    }
+
+    /**
+     * Creates the command-reference rows displayed in the sidebar.
+     *
+     * @return the command rows
+     */
+    private VBox createCommands() {
+        return new VBox(8,
                 createCommandChip("todo", "todo DESCRIPTION"),
                 createCommandChip("deadline", "deadline DESCRIPTION /by TIME"),
                 createCommandChip("event", "event DESCRIPTION /from START /to END"),
@@ -93,8 +107,14 @@ public class Main extends Application {
                 createCommandChip("unmark", "unmark INDEX"),
                 createCommandChip("delete", "delete INDEX"),
                 createCommandChip("bye", "bye"));
-        ScrollPane commandList = createCommandList(commands);
+    }
 
+    /**
+     * Creates the sidebar panel that shows the number of stored tasks.
+     *
+     * @return the task-count panel
+     */
+    private VBox createTaskPanel() {
         taskCount.setStyle(labelStyle(24, "bold", INK));
         Label taskCaption = new Label("tasks stored");
         taskCaption.setStyle(labelStyle(12, "normal", MUTED));
@@ -103,12 +123,7 @@ public class Main extends Application {
         taskPanel.setStyle("-fx-background-color: rgba(255, 250, 240, 0.8); "
                 + "-fx-border-color: " + TEAL + "; -fx-border-radius: 7px; "
                 + "-fx-background-radius: 7px; -fx-padding: 10px;");
-
-        VBox sidebar = new VBox(12, avatar, title, subtitle, section, commandList, taskPanel);
-        sidebar.setPrefWidth(260);
-        sidebar.setMinWidth(230);
-        sidebar.setStyle(shellPanelStyle());
-        return sidebar;
+        return taskPanel;
     }
 
     /**

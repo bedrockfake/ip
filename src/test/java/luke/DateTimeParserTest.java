@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import luke.datetime.DateTimeParser;
 
@@ -22,37 +24,20 @@ final class DateTimeParserTest {
         TestSupport.assertEquals("Dec 2 2019", DateTimeParser.formatDateOrTimeFromFlag("2 December 2019"));
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "2/12/2019 1800", "2/12/2019 18:00", "2/12/2019 6pm", "2/12/2019 6:00pm",
+        "2-12-2019 1800", "2019-12-2 1800", "2019/12/2 1800", "2 Dec 2019 1800",
+        "2 December 2019 1800"
+    })
+    void formatDateOrTimeFromFlag_supportedDateTimeValues(String input) {
+        TestSupport.assertEquals("Dec 2 2019 6:00 PM", DateTimeParser.formatDateOrTimeFromFlag(input));
+    }
+
     @Test
-    void formatDateOrTimeFromFlag_supportedDateTimeValues() {
-        TestSupport.assertEquals(
-                "Dec 2 2019 6:00 PM",
-                DateTimeParser.formatDateOrTimeFromFlag("2/12/2019 1800"));
-        TestSupport.assertEquals(
-                "Dec 2 2019 6:00 PM",
-                DateTimeParser.formatDateOrTimeFromFlag("2/12/2019 18:00"));
-        TestSupport.assertEquals(
-                "Dec 2 2019 6:00 PM",
-                DateTimeParser.formatDateOrTimeFromFlag("2/12/2019 6pm"));
-        TestSupport.assertEquals(
-                "Dec 2 2019 6:00 PM",
-                DateTimeParser.formatDateOrTimeFromFlag("2/12/2019 6:00pm"));
-        TestSupport.assertEquals(
-                "Dec 2 2019 6:00 PM",
-                DateTimeParser.formatDateOrTimeFromFlag("2-12-2019 1800"));
-        TestSupport.assertEquals(
-                "Dec 2 2019 6:00 PM",
-                DateTimeParser.formatDateOrTimeFromFlag("2019-12-2 1800"));
-        TestSupport.assertEquals(
-                "Dec 2 2019 6:00 PM",
-                DateTimeParser.formatDateOrTimeFromFlag("2019/12/2 1800"));
-        TestSupport.assertEquals(
-                "Sep 9 1999 8:00 PM",
+    void formatDateOrTimeFromFlag_supportedDateTimeWithDifferentDate() {
+        TestSupport.assertEquals("Sep 9 1999 8:00 PM",
                 DateTimeParser.formatDateOrTimeFromFlag("1999/9/9 20:00:00"));
-        TestSupport.assertEquals(
-                "Dec 2 2019 6:00 PM",
-                DateTimeParser.formatDateOrTimeFromFlag("2 Dec 2019 1800"));
-        TestSupport.assertEquals("Dec 2 2019 6:00 PM",
-                DateTimeParser.formatDateOrTimeFromFlag("2 December 2019 1800"));
     }
 
     @Test

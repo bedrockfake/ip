@@ -28,6 +28,7 @@ import luke.tasks.TaskTypes;
  */
 public class Luke {
     private static final String CHATBOT_NAME = "Luke";
+    private static final Pattern FLAG_PATTERN = Pattern.compile("(^|\\s)/(\\w+)");
 
     // ANSI escape codes. These are special strings the terminal reads as
     // "start coloring text" / "stop coloring text" rather than printing them.
@@ -224,45 +225,64 @@ public class Luke {
 
         Command command = parseCommand(keyword);
 
-        // A flag starts at the beginning of the argument text or after whitespace.
-        Pattern flagPattern = Pattern.compile("(^|\\s)/(\\w+)");
-        Matcher matcher = flagPattern.matcher(rest);
-        List<FlagMatch> flagMatches = new ArrayList<>();
-
-        while (matcher.find()) {
-            flagMatches.add(new FlagMatch(
-                    matcher.group(2),
-                    matcher.start() + matcher.group(1).length(),
-                    matcher.end()));
-        }
+        List<FlagMatch> flagMatches = findFlagMatches(rest);
 
         if (flagMatches.isEmpty()) {
             argument = rest.trim();
         } else {
             argument = rest.substring(0, flagMatches.get(0).start).trim();
 
-            for (int i = 0; i < flagMatches.size(); i++) {
-                FlagMatch flagMatch = flagMatches.get(i);
-                int valueEnd = i + 1 < flagMatches.size()
-                        ? flagMatches.get(i + 1).start
-                        : rest.length();
-                assert flagMatch.valueStart <= valueEnd : "Flag matches should be ordered.";
-                String value = rest.substring(flagMatch.valueStart, valueEnd).trim();
-                Flag flag = Flag.findByKeyword(flagMatch.keyword);
-
-                if (flag == null) {
-                    throw InvalidFlagException.unidentified(flagMatch.keyword);
-                }
-                if (value.isEmpty()) {
-                    throw InvalidFlagException.missingValue(flagMatch.keyword);
-                }
-                if (flags.put(flag, value) != null) {
-                    throw InvalidFlagException.duplicate(flagMatch.keyword);
-                }
-            }
+            parseFlags(rest, flagMatches, flags);
         }
 
         return new Invocation(command, argument, flags);
+    }
+
+    /**
+     * Finds flags that start the argument text or follow whitespace.
+     *
+     * @param text argument text to search
+     * @return flag locations in their original order
+     */
+    private List<FlagMatch> findFlagMatches(String text) {
+        Matcher matcher = FLAG_PATTERN.matcher(text);
+        List<FlagMatch> matches = new ArrayList<>();
+        while (matcher.find()) {
+            matches.add(new FlagMatch(
+                    matcher.group(2),
+                    matcher.start() + matcher.group(1).length(),
+                    matcher.end()));
+        }
+        return matches;
+    }
+
+    /**
+     * Extracts and validates values for the flags found in argument text.
+     *
+     * @param text raw argument text
+     * @param matches flag locations in {@code text}
+     * @param flags destination for parsed flag values
+     * @throws InvalidFlagException if a flag is unknown, empty, or repeated
+     */
+    private void parseFlags(String text, List<FlagMatch> matches,
+                            EnumMap<Flag, String> flags) throws InvalidFlagException {
+        for (int i = 0; i < matches.size(); i++) {
+            FlagMatch match = matches.get(i);
+            int valueEnd = i + 1 < matches.size() ? matches.get(i + 1).start : text.length();
+            assert match.valueStart <= valueEnd : "Flag matches should be ordered.";
+            String value = text.substring(match.valueStart, valueEnd).trim();
+            Flag flag = Flag.findByKeyword(match.keyword);
+
+            if (flag == null) {
+                throw InvalidFlagException.unidentified(match.keyword);
+            }
+            if (value.isEmpty()) {
+                throw InvalidFlagException.missingValue(match.keyword);
+            }
+            if (flags.put(flag, value) != null) {
+                throw InvalidFlagException.duplicate(match.keyword);
+            }
+        }
     }
 
     /**
