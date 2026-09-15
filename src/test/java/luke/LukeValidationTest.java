@@ -115,4 +115,17 @@ final class LukeValidationTest {
 
         TestSupport.assertContains(output, "Input contains unsupported control characters.");
     }
+
+    @Test
+    void rejectsEventsThatDoNotEndAfterTheirStart() {
+        String output = TestSupport.runLuke("""
+                event meeting /from 2/12/2019 1900 /to 2/12/2019 1800
+                event call /from 5pm /to 5pm
+                list
+                bye
+                """);
+
+        TestSupport.assertContains(output, "Event end must be after its start.");
+        TestSupport.assertContains(output, "No items added.");
+    }
 }
