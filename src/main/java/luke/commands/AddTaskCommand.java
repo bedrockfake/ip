@@ -1,5 +1,6 @@
 package luke.commands;
 
+import java.time.LocalDateTime;
 import java.util.EnumMap;
 
 import luke.Luke;
@@ -63,6 +64,7 @@ public class AddTaskCommand implements Command {
         }
         assert hasRequiredFlags(flags) : "Required flags should be present after validation.";
         formatDateTimeFlags(flags);
+        validateEventRange(flags);
 
         bot.getItems().add(argument, taskType, flags);
         int size = bot.getItems().size();
@@ -86,6 +88,26 @@ public class AddTaskCommand implements Command {
     private static void formatDateTimeFlags(EnumMap<Flag, String> flags) {
         for (Flag flag : flags.keySet()) {
             flags.put(flag, DateTimeParser.formatDateOrTimeFromFlag(flags.get(flag)));
+        }
+    }
+
+    /**
+     * Rejects an event when both endpoints are recognized and the end does not
+     * occur after the start. Unrecognized date text remains supported.
+     *
+     * @param flags formatted event flags
+     * @throws InvalidArgumentException if the event has an invalid time range
+     */
+    private void validateEventRange(EnumMap<Flag, String> flags)
+            throws InvalidArgumentException {
+        if (taskType != TaskTypes.EVENT) {
+            return;
+        }
+
+        LocalDateTime start = DateTimeParser.parseSortKey(flags.get(Flag.FROM));
+        LocalDateTime end = DateTimeParser.parseSortKey(flags.get(Flag.TO));
+        if (start != null && end != null && !end.isAfter(start)) {
+            throw InvalidArgumentException.invalidEventRange();
         }
     }
 

@@ -74,4 +74,14 @@ public class InvalidArgumentException extends UserInputException {
         return new InvalidArgumentException(
                 "Input contains unsupported control characters.");
     }
+
+    /**
+     * Creates an error for an event whose end is not after its start.
+     *
+     * @return formatted event-range exception
+     */
+    public static InvalidArgumentException invalidEventRange() {
+        return new InvalidArgumentException(
+                "Event end must be after its start.");
+    }
 }
