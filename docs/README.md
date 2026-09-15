@@ -1,30 +1,23 @@
 # Luke User Guide
 
-Luke is a command-line chatbot for tracking tasks. It saves your task list to
-`data/itemlist.txt` so tasks are available the next time you run the program.
+Luke is a friendly desktop chatbot for tracking todos, deadlines, and events.
+It saves your task list automatically, so your tasks are still available the
+next time you start the app.
+
+![Luke displaying a realistically populated task list](Ui.png)
 
 ## Quick Start
 
-Run Luke from the project root:
+Download `luke.jar` from the latest release, open a terminal in the folder
+containing it, and run:
 
 ```bash
-./gradlew run
+java -jar luke.jar
 ```
 
-To run the release JAR:
-
-```bash
-./gradlew jar
-java -jar build/lib/luke.jar
-```
-
-You will see a prompt:
-
-```text
->
-```
-
-Type one command per line. Use `bye` to exit.
+Type one command in the input box and press Enter or click the arrow button.
+The command reference in the left sidebar provides a quick reminder. Use
+`bye` when you are finished.
 
 ## Command Summary
 
@@ -96,11 +89,13 @@ Expected output:
 
 ```text
 Got it. I've added this task:
-  [E][ ] project meeting (from: Mon 2pm to: 4pm)
+  [E][ ] project meeting (from: Mon 2pm to: 4:00 PM)
 Now you have 1 tasks in the list.
 ```
 
 Both `/from` and `/to` are required. Event flags can contain spaces in their values.
+When Luke recognizes both values as dates or times, the end must be later than
+the start.
 
 ## Listing Tasks
 
@@ -273,35 +268,4 @@ Luke reports user input problems as normal chatbot errors. Common examples:
 | `mark banana` | `` `mark` command received invalid index: banana `` |
 | `mark 999` | `` `mark` command received out-of-bounds index: 999 `` |
 | `delete 999` | `` `delete` command received out-of-bounds index: 999 `` |
-
-## Developer Notes
-
-### Source Layout
-
-Main source files are in `src/main/java/luke`.
-
-Important classes:
-
-| File | Purpose |
-| --- | --- |
-| `luke/Luke.java` | Reads user input, parses commands and flags, and displays errors. |
-| `luke/commands/FixedCommand.java` | Defines fixed commands such as `list`, `mark`, `unmark`, `delete`, and `bye`. |
-| `luke/commands/AddTaskCommand.java` | Validates and adds todo, deadline, and event tasks. |
-| `luke/datetime/DateTimeParser.java` | Formats supported date and time values. |
-| `luke/tasks/TaskTypes.java` | Defines task-creation keywords and their required flags. |
-| `luke/tasks/ItemList.java` | Stores tasks and formats them for display. |
-| `luke/storage/ItemListStorage.java` | Handles loading and saving the task list. |
-| `luke/exceptions/` | Contains grouped user-input exceptions. |
-
-### Tests
-
-JUnit tests are in `src/test/java/luke`. `LukeCliTest.java` checks successful
-command-line flows, `LukeValidationTest.java` checks invalid input,
-`LukeStorageTest.java` checks loading and saving, and `DateTimeParserTest.java`
-checks date/time formatting behavior.
-
-Run tests from the project root:
-
-```bash
-./gradlew test
-```
+| `event call /from 5pm /to 4pm` | `Event end must be after its start.` |
